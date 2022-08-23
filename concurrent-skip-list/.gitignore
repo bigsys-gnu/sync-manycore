@@ -1,0 +1,8 @@
+/bazel-concurrenet_skip_list
+/bazel-bin
+/bazel-genfiles
+/bazel-io_bazel
+/bazel-out
+/bazel-testlogs
+/bazel.iml
+bazel-concurrent_skip_list
