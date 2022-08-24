@@ -1,9 +1,5 @@
-numa-config.h
-bench-harris
-bench-hp-harris
-bench-rcu
-bench-rlu
-bench-rlu-ordo
-bench-version
-bench-mvrlu-gclk
-bench-mvrlu-ordo
+# Binary files
+bench
+
+# c objects
+*.o

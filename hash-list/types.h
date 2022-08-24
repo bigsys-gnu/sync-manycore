@@ -17,9 +17,6 @@ typedef int val_t;
 typedef struct node {
 	val_t val;
 	struct node *p_next;
-#ifdef IS_VERSION
-        struct vlist_slot *slots;
-#endif
 
 	long padding[NODE_PADDING];
 } node_t;
@@ -34,21 +31,4 @@ typedef struct hash_list {
 	list_t *buckets[MAX_BUCKETS];  
 } hash_list_t;
 
-#define VLIST_ENTRIES_PER_TASK 2
-
-
-typedef struct vlist_record {
-	unsigned long epoch;
-	struct vlist_record *rec_next;
-	int count;
-	struct node *nodes[VLIST_ENTRIES_PER_TASK];
-	struct vlist_slot *slots[VLIST_ENTRIES_PER_TASK];
-} vlist_record_t;
-
-typedef struct vlist_slot {
-	unsigned long epoch;
-	struct node *next;
-	struct vlist_slot *slot_next;
-	struct vlist_record *rec;
-} vlist_slot_t;
 #endif
