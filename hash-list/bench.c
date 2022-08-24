@@ -361,6 +361,8 @@ int main(int argc, char **argv)
 		}
 	}
 
+
+
 	assert(n_buckets >= 1);
 	assert(duration >= 0);
 	assert(initial >= 0);
