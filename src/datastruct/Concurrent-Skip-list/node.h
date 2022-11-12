@@ -6,6 +6,7 @@
 #include <array>
 #include <utility>
 #include <memory>
+#include <iostream>
 
 using namespace std;
 
@@ -37,8 +38,6 @@ public:
   ~Node();
   int get_key();
   string get_value();
-  void lock();
-  void unlock();
   unique_lock<recursive_mutex> acquire_and_get()
   {
     return unique_lock<recursive_mutex>(lock_);

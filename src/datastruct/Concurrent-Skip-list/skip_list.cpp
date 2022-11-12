@@ -123,6 +123,7 @@ bool SkipList::add(int key, string value)
       // every level
       node_ptr pred;
       node_ptr succ;
+      node_ptr pre_pred;
 
       // Used to check if the predecessor and successors are same from when we
       // tried to read them before
@@ -133,7 +134,11 @@ bool SkipList::add(int key, string value)
           pred = preds[level];
           succ = succs[level];
 
-          locks.emplace_back(pred->acquire_and_get());
+          if (pred != pre_pred)
+            {
+              locks.emplace_back(pred->acquire_and_get());
+              pre_pred = pred;
+            }
 
           // If predecessor marked or if the predecessor and successors change,
           // then abort and try again
@@ -149,22 +154,17 @@ bool SkipList::add(int key, string value)
 
       // All conditions satisfied, create the node_t and insert it as we have all
       // the required locks
-      node_ptr new_node = make_shared<node_t>(key, std::move(value), top_level);
+      node_ptr new_node = make_shared<node_t>(key, value, top_level);
 
       // Update the predecessor and successors
       for(int level = 0; level <= top_level; level++)
         {
           new_node->next[level] = succs[level];
-        }
-
-      for(int level = 0; level <= top_level; level++)
-        {
           preds[level]->next[level] = new_node;
         }
 
       // Mark the node as completely linked.
       new_node->fully_linked = true;
-
       return true;
     }
 }
@@ -211,7 +211,7 @@ bool SkipList::remove(int key)
   vector<node_ptr> preds(MAX_LEVEL + 1, nullptr);
   vector<node_ptr> succs(MAX_LEVEL + 1, nullptr);
 
-  node_ptr victim = nullptr;
+  node_ptr victim;
   bool is_marked = false;
   int top_level = -1;
 
@@ -227,6 +227,8 @@ bool SkipList::remove(int key)
         {
           victim = succs[found];
         }
+      else
+        return false;
 
       // If node not found and the node to be deleted is fully linked and not
       // marked return
@@ -255,6 +257,8 @@ bool SkipList::remove(int key)
           // Traverse the skip list and try to acquire the lock of predecessor at
           // every level
           node_ptr pred;
+          node_ptr succ;
+          node_ptr pre_pred;
 
           // Used to check if the predecessors are not marked for delete and if
           // the predecessor next is the node we are trying to delete or if it is
@@ -264,12 +268,16 @@ bool SkipList::remove(int key)
           for(int level = 0; valid && (level <= top_level); level++)
             {
               pred = preds[level];
-
-              locks.emplace_back(pred->acquire_and_get());
+              succ = succs[level];
+              if (pred != pre_pred)
+                {
+                  locks.emplace_back(pred->acquire_and_get());
+                  pre_pred = pred;
+                }
 
               // If predecessor marked or if the predecessor's next has changed,
               // then abort and try again
-              valid = !(pred->marked) && pred->next[level] == victim;
+              valid = !(pred->marked) && pred->next[level] == succ;
             }
 
           // Conditons are not met, release locks, abort and try again.
@@ -286,7 +294,6 @@ bool SkipList::remove(int key)
             }
 
           // delete victim; -> shared ptr automatically remove victim
-
           return true;
         }
       else
