@@ -67,3 +67,6 @@ The range operation works similar to the search where we traverse the skip list 
 
 ``` perf stat -d /benchmark [--name] -i <max_number> -t <num_threads> --benchmark=<insert, delete, search, range, all_operations, high_contention, low_contention> [--help] ```
 
+
+### Paper Reference
+- https://link.springer.com/chapter/10.1007/978-3-540-72951-8_11
