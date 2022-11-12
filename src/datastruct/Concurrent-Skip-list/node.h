@@ -5,6 +5,7 @@
 #include <atomic>
 #include <array>
 #include <utility>
+#include <memory>
 
 using namespace std;
 
@@ -16,7 +17,7 @@ public:
   pair<int, string> key_value_pair;
 
   // Stores the reference of the next node until the top level for the node
-  array<Node *, L> next {nullptr};
+  array<shared_ptr<Node>, L> next {nullptr};
 
   // Lock to lock the node when modifing it
   mutex node_lock;

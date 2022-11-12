@@ -1,17 +1,19 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include "node.h"
 
 constexpr const size_t MAX_LEVEL = 255;
 using node_t = Node<MAX_LEVEL>;
+using node_ptr = shared_ptr<node_t>;
 
 class SkipList
 {
 private:
   // Head and Tail of the Skiplist
-  node_t *head_{nullptr};
-  node_t *tail_{nullptr};
+  shared_ptr<node_t> head_{nullptr};
+  shared_ptr<node_t> tail_{nullptr};
 
 public:
   SkipList();
@@ -19,7 +21,7 @@ public:
   int get_random_level();
 
   // Supported operations
-  int find(int key, vector<node_t *> &predecessors, vector<node_t *> &successors);
+  int find(int key, vector<node_ptr> &predecessors, vector<node_ptr> &successors);
   bool add(int key, string value);
   string search(int key);
   bool remove(int key);
