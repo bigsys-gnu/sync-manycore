@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <thread>
 
 #include "skip_list.h"
 
@@ -359,7 +360,7 @@ int main(int argc, char *argv[])
         {
 
           generate_input(max_number);
-          skiplist = SkipList(numbers_insert.size(), 0.5);
+          skiplist = SkipList();
 
           if(operation == "separate")
             {

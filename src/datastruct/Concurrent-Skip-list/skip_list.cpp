@@ -14,20 +14,18 @@
 #define INT_MINI numeric_limits<int>::min()
 #define INT_MAXI numeric_limits<int>::max()
 
-static int max_level;
-
 /**
     Constructor
 */
-SkipList::SkipList(int max_elements, float prob)
+SkipList::SkipList()
 {
-  max_level = (int) round(log(max_elements) / log(1 / prob)) - 1;
-  head = new Node(INT_MINI, max_level);
-  tail = new Node(INT_MAXI, max_level);
+  // MAX_LEVEL = (int) round(log(max_elements) / log(1 / prob)) - 1;
+  head_ = new node_t();
+  tail_ = new node_t();
 
-  for(size_t i = 0; i < head->next.size(); i++)
+  for (auto iter = head_->next.begin(); iter != head_->next.end(); iter++)
     {
-      head->next[i] = tail;
+      *iter = tail_;
     }
 }
 
@@ -36,14 +34,14 @@ SkipList::SkipList(int max_elements, float prob)
    exists or might exist. Updates the references in the vector using pass by
    reference. Returns -1 if not the key does not exist.
 */
-int SkipList::find(int key, vector<Node *> &predecessors, vector<Node *> &successors)
+int SkipList::find(int key, vector<node_t *> &predecessors, vector<node_t *> &successors)
 {
   int found = -1;
-  Node *prev = head;
+  node_t *prev = head_;
 
-  for(int level = max_level; level >= 0; level--)
+  for(int level = MAX_LEVEL; level >= 0; level--)
     {
-      Node *curr = prev->next[level];
+      node_t *curr = prev->next[level];
 
       while(key > curr->get_key())
         {
@@ -65,16 +63,16 @@ int SkipList::find(int key, vector<Node *> &predecessors, vector<Node *> &succes
 /**
     Randomly generates a number and increments level if number less than or
    equal to 0.5 Once more than 0.5, returns the level or available max level.
-    This decides until which level a new Node is available.
+    This decides until which level a new node_t is available.
 */
 int SkipList::get_random_level()
 {
-  int l = 0;
+  size_t l = 0;
   while(static_cast<float>(rand()) / static_cast<float>(RAND_MAX) <= 0.5)
     {
       l++;
     }
-  return l > max_level ? max_level : l;
+  return l >= MAX_LEVEL ? MAX_LEVEL - 1 : l;
 }
 
 /**
@@ -88,14 +86,8 @@ bool SkipList::add(int key, string value)
   int top_level = get_random_level();
 
   // Initialization of references of the predecessors and successors
-  vector<Node *> preds(max_level + 1);
-  vector<Node *> succs(max_level + 1);
-
-  for(size_t i = 0; i < preds.size(); i++)
-    {
-      preds[i] = NULL;
-      succs[i] = NULL;
-    }
+  vector<node_t *> preds(MAX_LEVEL + 1, nullptr);
+  vector<node_t *> succs(MAX_LEVEL + 1, nullptr);
 
   // Keep trying to insert the element into the list. In case predecessors and
   // successors are changed, this loop helps to try the insert again
@@ -110,7 +102,7 @@ bool SkipList::add(int key, string value)
       // insert needed If not found, go ahead with insert
       if(found != -1)
         {
-          Node *node_found = succs[found];
+          node_t *node_found = succs[found];
 
           if(!node_found->marked)
             {
@@ -123,17 +115,17 @@ bool SkipList::add(int key, string value)
         }
 
       // Store all the Nodes which lock we acquire in a map
-      // Map used so that we don't try to acquire lock to a Node we have already
+      // Map used so that we don't try to acquire lock to a node_t we have already
       // acquired This may happen when we have the same predecessor at different
       // levels
-      map<Node *, int> locked_nodes;
+      map<node_t *, int> locked_nodes;
 
       // Traverse the skip list and try to acquire the lock of predecessor at
       // every level
       try
         {
-          Node *pred;
-          Node *succ;
+          node_t *pred;
+          node_t *succ;
 
           // Used to check if the predecessor and successors are same from when we
           // tried to read them before
@@ -167,9 +159,9 @@ bool SkipList::add(int key, string value)
               continue;
             }
 
-          // All conditions satisfied, create the Node and insert it as we have all
+          // All conditions satisfied, create the node_t and insert it as we have all
           // the required locks
-          Node *new_node = new Node(key, value, top_level);
+          node_t *new_node = new node_t(key, value, top_level);
 
           // Update the predecessor and successors
           for(int level = 0; level <= top_level; level++)
@@ -214,14 +206,8 @@ string SkipList::search(int key)
 {
 
   // Finds the predecessor and successors
-  vector<Node *> preds(max_level + 1);
-  vector<Node *> succs(max_level + 1);
-
-  for(size_t i = 0; i < preds.size(); i++)
-    {
-      preds[i] = NULL;
-      succs[i] = NULL;
-    }
+  vector<node_t *> preds(MAX_LEVEL + 1, nullptr);
+  vector<node_t *> succs(MAX_LEVEL + 1, nullptr);
 
   int found = find(key, preds, succs);
 
@@ -231,11 +217,11 @@ string SkipList::search(int key)
       return "";
     }
 
-  Node *curr = head;
+  node_t *curr = head_;
 
-  for(int level = max_level; level >= 0; level--)
+  for(int level = MAX_LEVEL; level >= 0; level--)
     {
-      while(curr->next[level] != NULL && key > curr->next[level]->get_key())
+      while(curr->next[level] != nullptr && key > curr->next[level]->get_key())
         {
           curr = curr->next[level];
         }
@@ -244,7 +230,7 @@ string SkipList::search(int key)
   curr = curr->next[0];
 
   // If found, unmarked and fully linked, then return value. Else return empty.
-  if((curr != NULL) && (curr->get_key() == key) && succs[found]->fully_linked && !succs[found]->marked)
+  if((curr != nullptr) && (curr->get_key() == key) && succs[found]->fully_linked && !succs[found]->marked)
     {
       return curr->get_value();
     }
@@ -261,19 +247,13 @@ string SkipList::search(int key)
 bool SkipList::remove(int key)
 {
   // Initialization
-  Node *victim = NULL;
+  node_t *victim = nullptr;
   bool is_marked = false;
   int top_level = -1;
 
   // Initialization of references of the predecessors and successors
-  vector<Node *> preds(max_level + 1);
-  vector<Node *> succs(max_level + 1);
-
-  for(size_t i = 0; i < preds.size(); i++)
-    {
-      preds[i] = NULL;
-      succs[i] = NULL;
-    }
+  vector<node_t *> preds(MAX_LEVEL + 1, nullptr);
+  vector<node_t *> succs(MAX_LEVEL + 1, nullptr);
 
   // Keep trying to delete the element from the list. In case predecessors and
   // successors are changed, this loop helps to try the delete again
@@ -291,7 +271,7 @@ bool SkipList::remove(int key)
 
       // If node not found and the node to be deleted is fully linked and not
       // marked return
-      if(is_marked | (found != -1 && (victim->fully_linked && victim->top_level == found && !(victim->marked))))
+      if(is_marked | (found != -1 && (victim->fully_linked && victim->top_level == size_t(found) && !(victim->marked))))
         {
           // If not marked, the we lock the node and mark the node to delete
           if(!is_marked)
@@ -308,17 +288,17 @@ bool SkipList::remove(int key)
             }
 
           // Store all the Nodes which lock we acquire in a map
-          // Map used so that we don't try to acquire lock to a Node we have already
+          // Map used so that we don't try to acquire lock to a node_t we have already
           // acquired This may happen when we have the same predecessor at different
           // levels
-          map<Node *, int> locked_nodes;
+          map<node_t *, int> locked_nodes;
 
           // Traverse the skip list and try to acquire the lock of predecessor at
           // every level
           try
             {
-              Node *pred;
-              // Node* succ;
+              node_t *pred;
+              // node_t* succ;
 
               // Used to check if the predecessors are not marked for delete and if
               // the predecessor next is the node we are trying to delete or if it is
@@ -351,7 +331,7 @@ bool SkipList::remove(int key)
                   continue;
                 }
 
-              // All conditions satisfied, delete the Node and link them to the
+              // All conditions satisfied, delete the node_t and link them to the
               // successors appropriately
               for(int level = top_level; level >= 0; level--)
                 {
@@ -403,11 +383,11 @@ map<int, string> SkipList::range(int start_key, int end_key)
       return range_output;
     }
 
-  Node *curr = head;
+  node_t *curr = head_;
 
-  for(int level = max_level; level >= 0; level--)
+  for(int level = MAX_LEVEL; level >= 0; level--)
     {
-      while(curr->next[level] != NULL && start_key > curr->next[level]->get_key())
+      while(curr->next[level] != nullptr && start_key > curr->next[level]->get_key())
         {
           if(curr->get_key() >= start_key && curr->get_key() <= end_key)
             {
@@ -417,7 +397,7 @@ map<int, string> SkipList::range(int start_key, int end_key)
         }
     }
 
-  while(curr != NULL && end_key >= curr->get_key())
+  while(curr != nullptr && end_key >= curr->get_key())
     {
       if(curr->get_key() >= start_key && curr->get_key() <= end_key)
         {
@@ -434,14 +414,14 @@ map<int, string> SkipList::range(int start_key, int end_key)
 */
 void SkipList::display()
 {
-  for(int i = 0; i <= max_level; i++)
+  for(size_t i = 0; i <= MAX_LEVEL; i++)
     {
-      Node *temp = head;
+      node_t *temp = head_;
       int count = 0;
       if(!(temp->get_key() == INT_MINI && temp->next[i]->get_key() == INT_MAXI))
         {
-          printf("Level %d  ", i);
-          while(temp != NULL)
+          printf("Level %ld  ", i);
+          while(temp != nullptr)
             {
               printf("%d -> ", temp->get_key());
               temp = temp->next[i];
@@ -453,10 +433,6 @@ void SkipList::display()
         break;
     }
   printf("---------- Display done! ----------\n\n");
-}
-
-SkipList::SkipList()
-{
 }
 
 SkipList::~SkipList()

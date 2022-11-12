@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <thread>
 
 #include "skip_list.h"
 
@@ -256,7 +257,7 @@ void high_contention_benchmark_thread()
 
 void high_contention_benchmark()
 {
-  skiplist = SkipList(3, 0.5);
+  skiplist = SkipList();
 
   skiplist.add(1, "1");
   skiplist.add(2, "2");
@@ -284,7 +285,7 @@ void low_contention_benchmark()
       numbers_insert.push_back(i);
     }
 
-  skiplist = SkipList(numbers_insert.size(), 0.5);
+  skiplist = SkipList();
 
   // insert
   int chunk_size = ceil(float(numbers_insert.size()) / num_threads);
@@ -371,7 +372,7 @@ int main(int argc, char *argv[])
           if(benchmark == "insert")
             {
               generate_input(max_number);
-              skiplist = SkipList(numbers_insert.size(), 0.5);
+              skiplist = SkipList();
               clock_gettime(CLOCK_MONOTONIC, &start_time);
               insert_benchmark();
               clock_gettime(CLOCK_MONOTONIC, &end_time);
@@ -379,7 +380,7 @@ int main(int argc, char *argv[])
           else if(benchmark == "delete")
             {
               generate_input(max_number);
-              skiplist = SkipList(numbers_insert.size(), 0.5);
+              skiplist = SkipList();
               insert_benchmark();
               clock_gettime(CLOCK_MONOTONIC, &start_time);
               delete_benchmark();
@@ -388,7 +389,7 @@ int main(int argc, char *argv[])
           else if(benchmark == "search")
             {
               generate_input(max_number);
-              skiplist = SkipList(numbers_insert.size(), 0.5);
+              skiplist = SkipList();
               insert_benchmark();
               clock_gettime(CLOCK_MONOTONIC, &start_time);
               search_benchmark();
@@ -397,7 +398,7 @@ int main(int argc, char *argv[])
           else if(benchmark == "range")
             {
               generate_input(max_number);
-              skiplist = SkipList(numbers_insert.size(), 0.5);
+              skiplist = SkipList();
               insert_benchmark();
               clock_gettime(CLOCK_MONOTONIC, &start_time);
               range_benchmark();
@@ -406,7 +407,7 @@ int main(int argc, char *argv[])
           else if(benchmark == "all_operations")
             {
               generate_input(max_number);
-              skiplist = SkipList(numbers_insert.size(), 0.5);
+              skiplist = SkipList();
               clock_gettime(CLOCK_MONOTONIC, &start_time);
               all_operations_benchmark();
               clock_gettime(CLOCK_MONOTONIC, &end_time);
