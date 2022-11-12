@@ -12,8 +12,8 @@ class SkipList
 {
 private:
   // Head and Tail of the Skiplist
-  shared_ptr<node_t> head_{nullptr};
-  shared_ptr<node_t> tail_{nullptr};
+  node_ptr head_{nullptr};
+  node_ptr tail_{nullptr};
 
 public:
   SkipList();

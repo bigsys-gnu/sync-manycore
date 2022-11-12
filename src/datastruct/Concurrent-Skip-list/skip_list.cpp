@@ -11,8 +11,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define INT_MINI numeric_limits<int>::min()
-#define INT_MAXI numeric_limits<int>::max()
+constexpr const auto INT_MIN = numeric_limits<int>::min();
+constexpr const auto INT_MAX = numeric_limits<int>::max();
 
 /**
     Constructor
@@ -20,8 +20,8 @@
 SkipList::SkipList()
 {
   // MAX_LEVEL = (int) round(log(max_elements) / log(1 / prob)) - 1;
-  head_ = make_shared<node_t>(INT_MINI, MAX_LEVEL);
-  tail_ = make_shared<node_t>(INT_MAXI, MAX_LEVEL);
+  head_ = make_shared<node_t>(INT_MIN, MAX_LEVEL);
+  tail_ = make_shared<node_t>(INT_MAX, MAX_LEVEL);
 
   for (auto iter = head_->next.begin(); iter != head_->next.end(); iter++)
     {
@@ -93,7 +93,6 @@ bool SkipList::add(int key, string value)
   // successors are changed, this loop helps to try the insert again
   while(true)
     {
-
       // Find the predecessors and successors of where the key must be inserted
       int found = find(key, preds, succs);
 
@@ -348,7 +347,7 @@ void SkipList::display()
     {
       auto temp = head_;
       int count = 0;
-      if(!(temp->get_key() == INT_MINI && temp->next[i]->get_key() == INT_MAXI))
+      if(!(temp->get_key() == INT_MIN && temp->next[i]->get_key() == INT_MAX))
         {
           printf("Level %ld  ", i);
           while(temp != nullptr)
