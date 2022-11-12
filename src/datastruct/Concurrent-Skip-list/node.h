@@ -12,15 +12,16 @@ using namespace std;
 template <size_t L>
 class Node
 {
-public:
   // Stores the key and value for the Node
-  pair<int, string> key_value_pair;
+  pair<int, string> key_value_pair_;
 
+  // Lock to lock the node when modifing it
+  recursive_mutex lock_;
+
+public:
   // Stores the reference of the next node until the top level for the node
   array<shared_ptr<Node>, L> next {nullptr};
 
-  // Lock to lock the node when modifing it
-  mutex node_lock;
 
   // Atomic variable to be marked if this Node is being deleted
   atomic<bool> marked = {false};
@@ -38,6 +39,10 @@ public:
   string get_value();
   void lock();
   void unlock();
+  unique_lock<recursive_mutex> acquire_and_get()
+  {
+    return unique_lock<recursive_mutex>(lock_);
+  }
 };
 
 template <size_t L>
@@ -49,14 +54,14 @@ template <size_t L>
 Node<L>::Node(int key, size_t top_level):
   top_level(top_level)
 {
-  key_value_pair = make_pair(key, "");
+  key_value_pair_ = make_pair(key, "");
 }
 
 template <size_t L>
 Node<L>::Node(int key, string value, size_t top_level):
   top_level(top_level)
 {
-  key_value_pair = make_pair(key, value);
+  key_value_pair_ = make_pair(key, value);
 }
 
 /**
@@ -65,7 +70,7 @@ Node<L>::Node(int key, string value, size_t top_level):
 template <size_t L>
 int Node<L>::get_key()
 {
-  return key_value_pair.first;
+  return key_value_pair_.first;
 }
 
 /**
@@ -74,25 +79,7 @@ int Node<L>::get_key()
 template <size_t L>
 string Node<L>::get_value()
 {
-  return key_value_pair.second;
-}
-
-/**
-    Locks the node
-*/
-template <size_t L>
-void Node<L>::lock()
-{
-  node_lock.lock();
-}
-
-/**
-    Unlocks the node
-*/
-template <size_t L>
-void Node<L>::unlock()
-{
-  node_lock.unlock();
+  return key_value_pair_.second;
 }
 
 template <size_t L>

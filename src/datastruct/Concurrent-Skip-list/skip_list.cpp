@@ -118,83 +118,55 @@ bool SkipList::add(int key, string value)
       // Map used so that we don't try to acquire lock to a node_t we have already
       // acquired This may happen when we have the same predecessor at different
       // levels
-      map<node_ptr, int> locked_nodes;
+      vector<unique_lock<recursive_mutex>> locks;
 
       // Traverse the skip list and try to acquire the lock of predecessor at
       // every level
-      try
+      node_ptr pred;
+      node_ptr succ;
+
+      // Used to check if the predecessor and successors are same from when we
+      // tried to read them before
+      bool valid = true;
+
+      for(int level = 0; valid && (level <= top_level); level++)
         {
-          node_ptr pred;
-          node_ptr succ;
+          pred = preds[level];
+          succ = succs[level];
 
-          // Used to check if the predecessor and successors are same from when we
-          // tried to read them before
-          bool valid = true;
+          locks.emplace_back(pred->acquire_and_get());
 
-          for(int level = 0; valid && (level <= top_level); level++)
-            {
-              pred = preds[level];
-              succ = succs[level];
-
-              // If not already acquired lock, then acquire the lock
-              if(!(locked_nodes.count(pred)))
-                {
-                  pred->lock();
-                  locked_nodes.insert(make_pair(pred, 1));
-                }
-
-              // If predecessor marked or if the predecessor and successors change,
-              // then abort and try again
-              valid = !(pred->marked.load(std::memory_order_seq_cst)) &&
-                      !(succ->marked.load(std::memory_order_seq_cst)) && pred->next[level] == succ;
-            }
-
-          // Conditons are not met, release locks, abort and try again.
-          if(!valid)
-            {
-              for(auto const &x : locked_nodes)
-                {
-                  x.first->unlock();
-                }
-              continue;
-            }
-
-          // All conditions satisfied, create the node_t and insert it as we have all
-          // the required locks
-          node_ptr new_node = make_shared<node_t>(key, std::move(value), top_level);
-
-          // Update the predecessor and successors
-          for(int level = 0; level <= top_level; level++)
-            {
-              new_node->next[level] = succs[level];
-            }
-
-          for(int level = 0; level <= top_level; level++)
-            {
-              preds[level]->next[level] = new_node;
-            }
-
-          // Mark the node as completely linked.
-          new_node->fully_linked = true;
-
-          // Release lock of all the nodes held once insert is complete
-          for(auto const &x : locked_nodes)
-            {
-              x.first->unlock();
-            }
-
-          return true;
+          // If predecessor marked or if the predecessor and successors change,
+          // then abort and try again
+          valid = !(pred->marked.load(std::memory_order_seq_cst)) &&
+            !(succ->marked.load(std::memory_order_seq_cst)) && pred->next[level] == succ;
         }
-      catch(const std::exception &e)
+
+      // Conditons are not met, release locks, abort and try again.
+      if(!valid)
         {
-          // If any exception occurs during the above insert, release locks of the
-          // held nodes and try again.
-          std::cerr << e.what() << '\n';
-          for(auto const &x : locked_nodes)
-            {
-              x.first->unlock();
-            }
+          continue;
         }
+
+      // All conditions satisfied, create the node_t and insert it as we have all
+      // the required locks
+      node_ptr new_node = make_shared<node_t>(key, std::move(value), top_level);
+
+      // Update the predecessor and successors
+      for(int level = 0; level <= top_level; level++)
+        {
+          new_node->next[level] = succs[level];
+        }
+
+      for(int level = 0; level <= top_level; level++)
+        {
+          preds[level]->next[level] = new_node;
+        }
+
+      // Mark the node as completely linked.
+      new_node->fully_linked = true;
+
+      return true;
     }
 }
 
@@ -248,7 +220,6 @@ bool SkipList::remove(int key)
   // successors are changed, this loop helps to try the delete again
   while(true)
     {
-
       // Find the predecessors and successors of where the key to be deleted
       int found = find(key, preds, succs);
 
@@ -262,14 +233,14 @@ bool SkipList::remove(int key)
       // marked return
       if(is_marked | (found != -1 && (victim->fully_linked && victim->top_level == size_t(found) && !(victim->marked))))
         {
+          unique_lock<recursive_mutex> victim_lock;
           // If not marked, the we lock the node and mark the node to delete
           if(!is_marked)
             {
               top_level = victim->top_level;
-              victim->lock();
+              victim_lock = victim->acquire_and_get();
               if(victim->marked)
                 {
-                  victim->unlock();
                   return false;
                 }
               victim->marked = true;
@@ -280,74 +251,44 @@ bool SkipList::remove(int key)
           // Map used so that we don't try to acquire lock to a node_t we have already
           // acquired This may happen when we have the same predecessor at different
           // levels
-          map<node_ptr, int> locked_nodes;
+          vector<unique_lock<recursive_mutex>> locks;
 
           // Traverse the skip list and try to acquire the lock of predecessor at
           // every level
-          try
+          node_ptr pred;
+
+          // Used to check if the predecessors are not marked for delete and if
+          // the predecessor next is the node we are trying to delete or if it is
+          // changed.
+          bool valid = true;
+
+          for(int level = 0; valid && (level <= top_level); level++)
             {
-              node_ptr pred;
-              // node_t* succ;
+              pred = preds[level];
 
-              // Used to check if the predecessors are not marked for delete and if
-              // the predecessor next is the node we are trying to delete or if it is
-              // changed.
-              bool valid = true;
+              locks.emplace_back(pred->acquire_and_get());
 
-              for(int level = 0; valid && (level <= top_level); level++)
-                {
-                  pred = preds[level];
-
-                  // If not already acquired lock, then acquire the lock
-                  if(!(locked_nodes.count(pred)))
-                    {
-                      pred->lock();
-                      locked_nodes.insert(make_pair(pred, 1));
-                    }
-
-                  // If predecessor marked or if the predecessor's next has changed,
-                  // then abort and try again
-                  valid = !(pred->marked) && pred->next[level] == victim;
-                }
-
-              // Conditons are not met, release locks, abort and try again.
-              if(!valid)
-                {
-                  for(auto const &x : locked_nodes)
-                    {
-                      x.first->unlock();
-                    }
-                  continue;
-                }
-
-              // All conditions satisfied, delete the node_t and link them to the
-              // successors appropriately
-              for(int level = top_level; level >= 0; level--)
-                {
-                  preds[level]->next[level] = victim->next[level];
-                }
-
-              victim->unlock();
-
-              // delete victim;
-
-              // Delete is completed, release the locks held.
-              for(auto const &x : locked_nodes)
-                {
-                  x.first->unlock();
-                }
-
-              return true;
+              // If predecessor marked or if the predecessor's next has changed,
+              // then abort and try again
+              valid = !(pred->marked) && pred->next[level] == victim;
             }
-          catch(const std::exception &e)
+
+          // Conditons are not met, release locks, abort and try again.
+          if(!valid)
             {
-              // If any exception occurs during the above delete, release locks of the
-              // held nodes and try again.
-              for(auto const &x : locked_nodes)
-                {
-                  x.first->unlock();
-                }
+              continue;
             }
+
+          // All conditions satisfied, delete the node_t and link them to the
+          // successors appropriately
+          for(int level = top_level; level >= 0; level--)
+            {
+              preds[level]->next[level] = victim->next[level];
+            }
+
+          // delete victim; -> shared ptr automatically remove victim
+
+          return true;
         }
       else
         {
