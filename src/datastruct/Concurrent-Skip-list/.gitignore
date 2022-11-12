@@ -2,3 +2,11 @@
 benchmark
 skiplist
 unit_test_*
+
+# for emacs temp files
+*~
+~*
+#*
+
+# c++ files
+*.o
