@@ -217,20 +217,10 @@ string SkipList::search(int key)
       return "";
     }
 
-  auto curr = head_;
-
-  for(int level = MAX_LEVEL - 1; level >= 0; level--)
-    {
-      while(curr->next[level] != nullptr && key > curr->next[level]->get_key())
-        {
-          curr = curr->next[level];
-        }
-    }
-
-  curr = curr->next[0];
+  auto curr = succs[found];
 
   // If found, unmarked and fully linked, then return value. Else return empty.
-  if((curr != nullptr) && (curr->get_key() == key) && succs[found]->fully_linked && !succs[found]->marked)
+  if(curr->fully_linked && !curr->marked)
     {
       return curr->get_value();
     }
