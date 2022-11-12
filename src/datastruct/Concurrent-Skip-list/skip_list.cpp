@@ -20,8 +20,8 @@
 SkipList::SkipList()
 {
   // MAX_LEVEL = (int) round(log(max_elements) / log(1 / prob)) - 1;
-  head_ = new node_t();
-  tail_ = new node_t();
+  head_ = new node_t(INT_MINI, MAX_LEVEL);
+  tail_ = new node_t(INT_MAXI, MAX_LEVEL);
 
   for (auto iter = head_->next.begin(); iter != head_->next.end(); iter++)
     {
@@ -39,7 +39,7 @@ int SkipList::find(int key, vector<node_t *> &predecessors, vector<node_t *> &su
   int found = -1;
   node_t *prev = head_;
 
-  for(int level = MAX_LEVEL; level >= 0; level--)
+  for(int level = MAX_LEVEL - 1; level >= 0; level--)
     {
       node_t *curr = prev->next[level];
 
@@ -161,7 +161,7 @@ bool SkipList::add(int key, string value)
 
           // All conditions satisfied, create the node_t and insert it as we have all
           // the required locks
-          node_t *new_node = new node_t(key, value, top_level);
+          node_t *new_node = new node_t(key, std::move(value), top_level);
 
           // Update the predecessor and successors
           for(int level = 0; level <= top_level; level++)
@@ -219,7 +219,7 @@ string SkipList::search(int key)
 
   node_t *curr = head_;
 
-  for(int level = MAX_LEVEL; level >= 0; level--)
+  for(int level = MAX_LEVEL - 1; level >= 0; level--)
     {
       while(curr->next[level] != nullptr && key > curr->next[level]->get_key())
         {
@@ -385,7 +385,7 @@ map<int, string> SkipList::range(int start_key, int end_key)
 
   node_t *curr = head_;
 
-  for(int level = MAX_LEVEL; level >= 0; level--)
+  for(int level = MAX_LEVEL - 1; level >= 0; level--)
     {
       while(curr->next[level] != nullptr && start_key > curr->next[level]->get_key())
         {
@@ -414,7 +414,7 @@ map<int, string> SkipList::range(int start_key, int end_key)
 */
 void SkipList::display()
 {
-  for(size_t i = 0; i <= MAX_LEVEL; i++)
+  for(size_t i = 0; i < MAX_LEVEL; i++)
     {
       node_t *temp = head_;
       int count = 0;
