@@ -1,14 +1,18 @@
-CFLAGS = -Wall -g -std=c++11
+LIBS = -pthread
+CFLAGS = -Wall -std=c++17 ${LIBS}
 CXX = g++
+SRCS = key_value_pair node skip_list
+OBJS = $(addsuffix .o, ${SRCS})
+TARGETS = skiplist benchmark unit_test_1 unit_test_2 unit_test_3
+TARGET_SRCS = $(addsuffix .cpp, ${TARGETS})
 
-all: skiplist
+all: ${TARGETS}
 
-skiplist:
-	$(CXX) main.cpp key_value_pair.cpp node.cpp skip_list.cpp -o skiplist -pthread $(CFLAGS)
-	$(CXX) benchmark.cpp key_value_pair.cpp node.cpp skip_list.cpp -o benchmark -pthread  $(CFLAGS)
-	$(CXX) unit_test_1.cpp key_value_pair.cpp node.cpp skip_list.cpp -o unit_test_1 -pthread  $(CFLAGS)
-	$(CXX) unit_test_2.cpp key_value_pair.cpp node.cpp skip_list.cpp -o unit_test_2 -pthread  $(CFLAGS)
-	$(CXX) unit_test_3.cpp key_value_pair.cpp node.cpp skip_list.cpp -o unit_test_3 -pthread  $(CFLAGS)
+${TARGETS}: %: %.cpp ${OBJS}
+	$(CXX) $(CFLAGS) -o $@ $^
+
+${OBJS}: %.o: %.cpp
+	$(CXX) $(CFLAGS) -c $^
 
 clean:
-	rm skiplist benchmark unit_test_1 unit_test_2 unit_test_3
+	rm -f ${TARGETS} ${OBJS}
