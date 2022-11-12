@@ -27,7 +27,7 @@ public:
   // Atomic variable to indicate the Node is completely linked to predecessors and successors
   atomic<bool> fully_linked = {false};
 
-  size_t top_level{L};
+  const size_t top_level{L};
 
   Node();
   Node(int key, size_t top_level);
