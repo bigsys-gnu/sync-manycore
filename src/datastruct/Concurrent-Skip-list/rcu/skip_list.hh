@@ -2,7 +2,7 @@
 
 #include <map>
 #include <memory>
-#include "node.h"
+#include "node.hh"
 
 constexpr const size_t MAX_LEVEL = 255;
 using node_t = Node<MAX_LEVEL>;

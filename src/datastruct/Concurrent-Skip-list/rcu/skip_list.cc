@@ -3,13 +3,15 @@
    search and range operations
 */
 
-#include "skip_list.h"
+#include "skip_list.hh"
 #include <iostream>
 #include <limits>
 #include <map>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "rcu_api.hh"
 
 constexpr const auto INT_MIN = numeric_limits<int>::min();
 constexpr const auto INT_MAX = numeric_limits<int>::max();
@@ -36,6 +38,7 @@ SkipList::SkipList()
 */
 int SkipList::find(int key, vector<node_ptr> &predecessors, vector<node_ptr> &successors)
 {
+  rcu_api::reader_scope reader_session;
   int found = -1;
   auto prev = head_;
 
@@ -81,7 +84,6 @@ int SkipList::get_random_level()
 */
 bool SkipList::add(int key, string value)
 {
-
   // Get the level until which the new node must be available
   int top_level = get_random_level();
 
@@ -179,6 +181,8 @@ string SkipList::search(int key)
   // Finds the predecessor and successors
   vector<node_ptr> preds(MAX_LEVEL + 1, nullptr);
   vector<node_ptr> succs(MAX_LEVEL + 1, nullptr);
+
+  rcu_api::reader_scope reader_session;
 
   int found = find(key, preds, succs);
 
@@ -293,7 +297,9 @@ bool SkipList::remove(int key)
               preds[level]->next[level] = victim->next[level];
             }
 
-          // delete victim; -> shared ptr automatically remove victim
+          // delete victim;
+          rcu_api::free(victim);
+
           return true;
         }
       else
@@ -317,6 +323,8 @@ map<int, string> SkipList::range(int start_key, int end_key)
     {
       return range_output;
     }
+
+  rcu_api::reader_scope reader_session;
 
   auto curr = head_;
 
