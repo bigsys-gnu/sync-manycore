@@ -7,19 +7,6 @@
 
 namespace rcu_api
 {
-  class rcu_handle
-  {
-    int id_;
-  public:
-    rcu_handle();
-
-    ~rcu_handle();
-
-    int get_id()
-    {
-      return id_;
-    }
-  };
 
   class reader_scope
   {
@@ -34,6 +21,8 @@ namespace rcu_api
     writer_scope();
     ~writer_scope();
   };
+
+  void regist();
 
   template <typename T>
   void free(T* ptr)

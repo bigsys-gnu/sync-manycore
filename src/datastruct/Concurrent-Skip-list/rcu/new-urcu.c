@@ -72,7 +72,9 @@ void urcu_register(int id){
     }
 }
 void urcu_unregister(){
+  if (times){
     free(times);
+  }
 }
 
 void urcu_reader_lock(){

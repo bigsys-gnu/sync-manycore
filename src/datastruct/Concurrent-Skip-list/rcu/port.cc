@@ -1,4 +1,5 @@
 #include "node.hh"
+#include "port.h"
 
 void port_free(void *ptr)
 {
