@@ -298,8 +298,7 @@ bool SkipList::remove(int key)
             }
 
           // delete victim;
-          rcu_api::synchronize();
-          delete victim;
+          rcu_api::free(victim);
 
           return true;
         }
@@ -381,4 +380,10 @@ void SkipList::display()
 
 SkipList::~SkipList()
 {
+  for (auto iter = head_; iter != nullptr;)
+    {
+      auto tmp = iter;
+      iter = iter->next[0];
+      delete tmp;
+    }
 }
