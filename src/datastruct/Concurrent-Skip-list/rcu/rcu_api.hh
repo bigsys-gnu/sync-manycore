@@ -7,7 +7,6 @@
 
 namespace rcu_api
 {
-
   class reader_scope
   {
   public:
@@ -24,11 +23,7 @@ namespace rcu_api
 
   void regist();
 
-  template <typename T>
-  void free(T* ptr)
-  {
-    urcu_free(reinterpret_cast<void *>(ptr));
-  }
+  void free(void* ptr);
 
   void synchronize();
 }

@@ -69,17 +69,22 @@ reader_scope::~reader_scope()
 
 writer_scope::writer_scope()
 {
-  urcu_writer_lock(handle.get_id());
+  urcu_writer_lock(0);
 }
 
 writer_scope::~writer_scope()
 {
-  urcu_writer_unlock(handle.get_id());
+  urcu_writer_unlock(0);
 }
 
 void rcu_api::regist()
 {
   handle = rcu_handle(true);
+}
+
+void rcu_api::free(void *ptr)
+{
+  urcu_free(ptr);
 }
 
 void rcu_api::synchronize()

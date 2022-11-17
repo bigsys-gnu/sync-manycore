@@ -298,7 +298,8 @@ bool SkipList::remove(int key)
             }
 
           // delete victim;
-          rcu_api::free(victim);
+          rcu_api::writer_scope write_session;
+          rcu_api::free(reinterpret_cast<void *>(victim));
 
           return true;
         }

@@ -1,6 +1,6 @@
 LIBS = -pthread
-CXXFLAGS = -Wall -std=c++17 -g
-CFLSGS = -Wall -g
+CXXFLAGS = -Wall -std=c++17
+CFLSGS = -Wall
 CC = gcc
 CXX = g++
 C_OBJ = new-urcu.o
