@@ -4,6 +4,7 @@
 #include <pthread.h>
 
 #include "new-urcu.h"
+#include "port.h"
 
 /**
  * Copyright 2014 Maya Arbel (mayaarl [at] cs [dot] technion [dot] ac [dot] il).
@@ -140,7 +141,7 @@ void urcu_free(void *ptr) {
 		urcu_synchronize();
 		
 		for (k = 0; k < urcu_table[i]->f_size; k++) {
-			free(urcu_table[i]->free_ptrs[k]);
+			port_free(urcu_table[i]->free_ptrs[k]);
 		}
 		
 		urcu_table[i]->f_size = 0;

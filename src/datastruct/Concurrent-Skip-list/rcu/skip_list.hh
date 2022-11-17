@@ -4,10 +4,6 @@
 #include <memory>
 #include "node.hh"
 
-constexpr const size_t MAX_LEVEL = 255;
-using node_t = Node<MAX_LEVEL>;
-using node_ptr = node_t *;
-
 class SkipList
 {
 private:

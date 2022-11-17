@@ -4,7 +4,7 @@ CFLSGS = -Wall -g
 CC = gcc
 CXX = g++
 C_OBJ = new-urcu.o
-CXX_OBJ = rcu_api.o skip_list.o
+CXX_OBJ = rcu_api.o skip_list.o port.o
 TARGET = benchmark
 
 

@@ -298,7 +298,8 @@ bool SkipList::remove(int key)
             }
 
           // delete victim;
-          rcu_api::free(victim);
+          rcu_api::synchronize();
+          delete victim;
 
           return true;
         }

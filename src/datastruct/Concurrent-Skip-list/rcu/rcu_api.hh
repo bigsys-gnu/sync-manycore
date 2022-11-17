@@ -2,6 +2,7 @@
 
 #include <thread>
 #include <utility>
+#include <iostream>
 #include "new-urcu.h"
 
 namespace rcu_api
@@ -10,16 +11,9 @@ namespace rcu_api
   {
     int id_;
   public:
-    rcu_handle():
-      id_(std::hash<std::thread::id>{}(std::this_thread::get_id()))
-    {
-      urcu_register(id_);
-    }
+    rcu_handle();
 
-    ~rcu_handle()
-    {
-      urcu_unregister();
-    }
+    ~rcu_handle();
 
     int get_id()
     {
@@ -48,5 +42,4 @@ namespace rcu_api
   }
 
   void synchronize();
-
-}    
+}
