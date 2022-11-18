@@ -27,10 +27,10 @@ struct statistics
 
 struct global_data
 {
-  unsigned int thread_num{8};
+  unsigned int thread_num{6};
   std::default_random_engine engine;
   std::uniform_int_distribution<unsigned int> dist = std::uniform_int_distribution<unsigned int>(1, 3);
-  std::uniform_int_distribution<int> key_dist = std::uniform_int_distribution<int>(1, 10000);
+  std::uniform_int_distribution<int> key_dist = std::uniform_int_distribution<int>(1, 1000000);
   std::mutex cond_lock;
   std::condition_variable condvar;
   std::mutex stat_lock;
