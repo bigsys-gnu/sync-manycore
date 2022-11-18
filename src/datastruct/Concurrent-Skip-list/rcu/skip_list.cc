@@ -209,7 +209,7 @@ string SkipList::search(int key)
     Deletes from the Skip list at the appropriate place using locks.
     Return if key doesn’t exist in the list.
 */
-bool SkipList::remove(int key)
+node_ptr SkipList::remove_impl(int key)
 {
   // Initialization of references of the predecessors and successors
   vector<node_ptr> preds(MAX_LEVEL + 1, nullptr);
@@ -232,7 +232,7 @@ bool SkipList::remove(int key)
           victim = succs[found];
         }
       else
-        return false;
+        return nullptr;
 
       // If node not found and the node to be deleted is fully linked and not
       // marked return
@@ -246,7 +246,7 @@ bool SkipList::remove(int key)
               victim_lock = victim->acquire_and_get();
               if(victim->marked)
                 {
-                  return false;
+                  return nullptr;
                 }
               victim->marked = true;
               is_marked = true;
@@ -298,16 +298,26 @@ bool SkipList::remove(int key)
             }
 
           // delete victim;
-          rcu_api::writer_scope write_session;
-          rcu_api::free(reinterpret_cast<void *>(victim));
 
-          return true;
+          return victim;
         }
       else
         {
-          return false;
+          return nullptr;
         }
     }
+}
+
+bool SkipList::remove(int key)
+{
+  auto victim = remove_impl(key);
+  if (victim != nullptr)
+    {
+      rcu_api::writer_scope write_session;
+      rcu_api::free(reinterpret_cast<void *>(victim));
+      return true;
+    }
+  return false;
 }
 
 /**
