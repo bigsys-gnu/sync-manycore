@@ -9,6 +9,7 @@
 #include "port-kernel.h"
 #else
 #include "port-user.h"
+#include "port_cxx.hh"
 #endif
 
 static inline void *port_alloc(size_t size)

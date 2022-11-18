@@ -1,4 +1,6 @@
 CUR_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+CC := gcc
+CXX := g++
 
 TOOLS_DIR := ../tools
 INC_DIR := ../include
@@ -22,6 +24,8 @@ CFLAGS += -Wno-unused-parameter -Wno-unused-value
 CFLAGS += -Wno-unused-function -Wno-packed-not-aligned
 # CFALGS += -DMVRLU_DISABLE_ADDR_ACTUAL_TYPE_CHECKING
 
+CXXFLAGS += -I$(INC_DIR)
+
 LDFLAGS += -lpthread $(MEMMGR)
 
 DEPS_DIR  := $(CUR_DIR)/.deps$(LIB_SUFFIX)
@@ -29,12 +33,15 @@ DEPCFLAGS = -MD -MF $(DEPS_DIR)/$*.d -MP
 
 SRC_FILES = $(wildcard *.c)
 OBJS_DIR  = $(CUR_DIR)/.objs$(LIB_SUFFIX)
-OBJ_FILES = $(addprefix $(OBJS_DIR)/, $(SRC_FILES:.c=.o))
+OBJ_FILES = $(addprefix $(OBJS_DIR)/, $(SRC_FILES:.c=.o) port_cxx.o)
 
 all: $(INC_DIR)/numa-config.h libmvrlu$(LIB_SUFFIX).a
 
 $(OBJS_DIR)/%.o: %.c $(DEPS_DIR) $(OBJS_DIR)
 	$(Q)$(CC) $(CFLAGS) $(DEPCFLAGS) -c -o $@ $<
+
+$(OBJS_DIR)/port_cxx.o: port_cxx.cc $(DEPS_DIR) $(OBJS_DIR)
+	$(Q)$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 $(OBJS_DIR):
 	$(Q)mkdir -p $(OBJS_DIR)

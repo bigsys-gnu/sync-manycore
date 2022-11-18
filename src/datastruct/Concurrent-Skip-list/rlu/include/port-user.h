@@ -122,22 +122,6 @@ static inline int port_addr_in_log_region(void *addr)
 }
 
 /*
- * Memory allocation
- */
-
-#define PORT_DEFAULT_ALLOC_FLAG 0
-
-static inline void *port_alloc_x(size_t size, unsigned int __dummy)
-{
-	return malloc(size);
-}
-
-static inline void port_free(void *ptr)
-{
-	free(ptr);
-}
-
-/*
  * Synchronization
  */
 

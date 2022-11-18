@@ -31,8 +31,8 @@ Node<L>::Node()
 }
 
 template <size_t L>
-Node<L>::Node(int key, size_t top_level):
-  key_(key), top_level(top_level)
+Node<L>::Node(int key, size_t level):
+  key_(key), top_level(level)
 {
 }
 
