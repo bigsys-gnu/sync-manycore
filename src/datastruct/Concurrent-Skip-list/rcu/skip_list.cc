@@ -7,9 +7,8 @@
 #include <iostream>
 #include <limits>
 #include <map>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 #include "rcu_api.hh"
 

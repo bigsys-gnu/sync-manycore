@@ -1,10 +1,5 @@
 #pragma once
 
-#include <thread>
-#include <utility>
-#include <iostream>
-#include "new-urcu.h"
-
 namespace rcu_api
 {
   class reader_scope
@@ -20,6 +15,8 @@ namespace rcu_api
     writer_scope();
     ~writer_scope();
   };
+
+  void init(int thread_num);
 
   void regist();
 

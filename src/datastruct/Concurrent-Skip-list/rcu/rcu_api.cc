@@ -77,6 +77,11 @@ writer_scope::~writer_scope()
   urcu_writer_unlock(0);
 }
 
+void rcu_api::init(int thread_num)
+{
+  urcu_init(thread_num);
+}
+
 void rcu_api::regist()
 {
   handle = rcu_handle(true);

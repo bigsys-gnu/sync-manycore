@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 {
   global_data gd;
   std::vector<std::thread> workers;
-  urcu_init(gd.thread_num);
+  rcu_api::init(gd.thread_num);
 
   for (int i = 0; i < gd.thread_num; i++)
     {
