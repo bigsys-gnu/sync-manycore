@@ -1,7 +1,7 @@
 CUR_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 TOOLS_DIR := ../tools
-INC_DIR := ./
+INC_DIR := ../include
 
 # configuration
 ifeq ($(strip $(CONF)),gclk)

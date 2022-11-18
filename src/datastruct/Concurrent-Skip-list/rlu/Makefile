@@ -1,10 +1,13 @@
-LIBS = -pthread
-CXXFLAGS = -Wall -std=c++17
+LIBS = -lmvrlu-ordo
+CXXFLAGS = -Wall -std=c++17 -pthread
+INCLUDES := -I./include
+LIB_DIR := -L./lib
 
 CFLSGS = -Wall
 CFLAGS += -D_REENTRANT
 CFLAGS += -Werror
 CFLAGS += -mrtm
+CFLAGS += -pthread
 
 ifdef DEBUG
 	CFLAGS += -O0 -g3
@@ -16,29 +19,33 @@ endif
 CC = gcc
 CXX = g++
 C_OBJ =
-CXX_OBJ = skip_list.o port.o
-TARGET = benchmark
+CXX_OBJ =
+BIN = main
 
 
-${TARGET}: %: %.cc ${C_OBJ} ${CXX_OBJ}
-	$(CXX) $^ -o $@
+main: main.cc mvrlu
+	$(CXX) -o $@ $< $(LIBS) $(CXXFLAGS) $(INCLUDES) $(LIB_DIR)
 
 
 ${CXX_OBJ}: %.o: %.cc
-	$(CXX) -c $< $(LIBS) $(CXXFLAGS)
+	$(CXX) -c $< $(LIBS) $(CXXFLAGS) $(INCLUDES)
 
 
 ${C_OBJ}: %.o: %.c
-	$(CC) -c $< $(LIBS) $(CFLAGS)
+	$(CC) -c $< $(LIBS) $(CFLAGS) $(INCLUDES)
 
 
 # C libraries
-rlu.o: rlu.c rlu.h
-	$(CC) $(CFLAGS) $(DEFINES) -c -o $@ $<
+rlu.o: ./lib/rlu.c ./include/rlu.h
+	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -c -o $@ $<
 
 
-rlu-ordo.o: rlu.c rlu.h
-	$(CC) $(CFLAGS) $(DEFINES) -DRLU_ORDO_TIMESTAMPING -c -o $@ $<
+rlu-ordo.o: ./lib/rlu.c ./include/rlu.h
+	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -DRLU_ORDO_TIMESTAMPING -c -o $@ $<
+
+
+mvrlu:
+	$(MAKE) -C ./lib/
 
 
 numa-config.h:
@@ -46,4 +53,5 @@ numa-config.h:
 
 
 clean:
-	rm -f ${C_OBJ} ${CXX_OBJ} ${TARGET}
+	rm -f *.o ${BIN}
+	$(MAKE) -C ./lib/ clean
