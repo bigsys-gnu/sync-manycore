@@ -1,6 +1,7 @@
 CUR_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-include $(CUR_DIR)/../Makefile.inc
+TOOLS_DIR := ../tools
+INC_DIR := ./
 
 # configuration
 ifeq ($(strip $(CONF)),gclk)
