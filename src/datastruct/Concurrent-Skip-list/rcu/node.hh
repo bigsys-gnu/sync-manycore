@@ -15,7 +15,7 @@ class Node
   pair<int, string> key_value_pair_;
 
   // Lock to lock the node when modifing it
-  mutex lock_;
+  recursive_mutex lock_;
 
 public:
   // Stores the reference of the next node until the top level for the node
@@ -37,7 +37,7 @@ public:
   int get_key();
   string get_value();
 
-  mutex& get_lock()
+  recursive_mutex& get_lock()
   {
     return lock_;
   }

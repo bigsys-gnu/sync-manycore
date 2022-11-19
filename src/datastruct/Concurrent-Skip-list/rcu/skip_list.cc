@@ -87,13 +87,14 @@ bool SkipList::add(int key, string value)
   int top_level = get_random_level();
 
   // Initialization of references of the predecessors and successors
-  vector<node_ptr> preds(MAX_LEVEL + 1, nullptr);
-  vector<node_ptr> succs(MAX_LEVEL + 1, nullptr);
+  vector<node_ptr> preds(MAX_LEVEL, nullptr);
+  vector<node_ptr> succs(MAX_LEVEL, nullptr);
 
   // Keep trying to insert the element into the list. In case predecessors and
   // successors are changed, this loop helps to try the insert again
   while(true)
     {
+      rcu_api::reader_scope rs;
       // Find the predecessors and successors of where the key must be inserted
       int found = find(key, preds, succs);
 
@@ -118,13 +119,13 @@ bool SkipList::add(int key, string value)
       // Map used so that we don't try to acquire lock to a node_t we have already
       // acquired This may happen when we have the same predecessor at different
       // levels
-      vector<unique_lock<mutex>> locks;
+      vector<unique_lock<recursive_mutex>> locks;
 
       // Traverse the skip list and try to acquire the lock of predecessor at
       // every level
       node_ptr pred;
       node_ptr succ;
-      node_ptr pre_pred;
+      node_ptr pre_pred = nullptr;
 
       // Used to check if the predecessor and successors are same from when we
       // tried to read them before
@@ -137,14 +138,14 @@ bool SkipList::add(int key, string value)
 
           if (pred != pre_pred)
             {
-              locks.emplace_back(unique_lock<mutex>(pred->get_lock()));
+              locks.emplace_back(pred->get_lock());
               pre_pred = pred;
             }
 
           // If predecessor marked or if the predecessor and successors change,
           // then abort and try again
-          valid = !(pred->marked.load(std::memory_order_seq_cst)) &&
-            !(succ->marked.load(std::memory_order_seq_cst)) && pred->next[level] == succ;
+          valid = !pred->marked &&
+            !succ->marked && pred->next[level] == succ;
         }
 
       // Conditons are not met, release locks, abort and try again.
@@ -178,8 +179,8 @@ string SkipList::search(int key)
 {
 
   // Finds the predecessor and successors
-  vector<node_ptr> preds(MAX_LEVEL + 1, nullptr);
-  vector<node_ptr> succs(MAX_LEVEL + 1, nullptr);
+  vector<node_ptr> preds(MAX_LEVEL, nullptr);
+  vector<node_ptr> succs(MAX_LEVEL, nullptr);
 
   rcu_api::reader_scope reader_session;
 
@@ -211,8 +212,8 @@ string SkipList::search(int key)
 node_ptr SkipList::remove_impl(int key)
 {
   // Initialization of references of the predecessors and successors
-  vector<node_ptr> preds(MAX_LEVEL + 1, nullptr);
-  vector<node_ptr> succs(MAX_LEVEL + 1, nullptr);
+  vector<node_ptr> preds(MAX_LEVEL, nullptr);
+  vector<node_ptr> succs(MAX_LEVEL, nullptr);
 
   node_ptr victim = nullptr;
   bool is_marked = false;
@@ -222,6 +223,7 @@ node_ptr SkipList::remove_impl(int key)
   // successors are changed, this loop helps to try the delete again
   while(true)
     {
+      rcu_api::reader_scope rs;
       // Find the predecessors and successors of where the key to be deleted
       int found = find(key, preds, succs);
 
@@ -237,7 +239,7 @@ node_ptr SkipList::remove_impl(int key)
       // marked return
       if(is_marked || (found != -1 && (victim->fully_linked && victim->top_level == size_t(found) && !(victim->marked))))
         {
-          unique_lock<mutex> victim_lock(victim->get_lock(), defer_lock);
+          unique_lock<recursive_mutex> victim_lock(victim->get_lock(), defer_lock);
           // If not marked, the we lock the node and mark the node to delete
           if(!is_marked)
             {
@@ -255,13 +257,13 @@ node_ptr SkipList::remove_impl(int key)
           // Map used so that we don't try to acquire lock to a node_t we have already
           // acquired This may happen when we have the same predecessor at different
           // levels
-          vector<unique_lock<mutex>> locks;
+          vector<unique_lock<recursive_mutex>> locks;
 
           // Traverse the skip list and try to acquire the lock of predecessor at
           // every level
           node_ptr pred;
           node_ptr succ;
-          node_ptr pre_pred;
+          node_ptr pre_pred = nullptr;
 
           // Used to check if the predecessors are not marked for delete and if
           // the predecessor next is the node we are trying to delete or if it is
@@ -274,7 +276,7 @@ node_ptr SkipList::remove_impl(int key)
               succ = succs[level];
               if (pred != pre_pred)
                 {
-                  locks.emplace_back(unique_lock<mutex>(pred->get_lock()));
+                  locks.emplace_back(pred->get_lock());
                   pre_pred = pred;
                 }
 
@@ -312,6 +314,8 @@ bool SkipList::remove(int key)
   if (victim != nullptr)
     {
       rcu_api::writer_scope write_session;
+      // rcu_api::synchronize();
+      // delete victim;
       rcu_api::free(reinterpret_cast<void *>(victim));
       return true;
     }
