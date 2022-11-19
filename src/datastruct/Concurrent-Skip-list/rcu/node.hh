@@ -15,7 +15,7 @@ class Node
   pair<int, string> key_value_pair_;
 
   // Lock to lock the node when modifing it
-  recursive_mutex lock_;
+  mutex lock_;
 
 public:
   // Stores the reference of the next node until the top level for the node
@@ -36,10 +36,12 @@ public:
   ~Node();
   int get_key();
   string get_value();
-  unique_lock<recursive_mutex> acquire_and_get()
+
+  mutex& get_lock()
   {
-    return unique_lock<recursive_mutex>(lock_);
+    return lock_;
   }
+
 };
 
 template <size_t L>

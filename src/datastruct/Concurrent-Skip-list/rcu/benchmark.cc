@@ -8,6 +8,7 @@
 #include <condition_variable>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include "rcu_api.hh"
 #include "skip_list.hh"
 
@@ -27,7 +28,7 @@ struct statistics
 
 struct global_data
 {
-  unsigned int thread_num{6};
+  unsigned int thread_num{8};
   std::default_random_engine engine;
   std::uniform_int_distribution<unsigned int> dist = std::uniform_int_distribution<unsigned int>(1, 3);
   std::uniform_int_distribution<int> key_dist = std::uniform_int_distribution<int>(1, 1000000);
@@ -108,10 +109,10 @@ int main(int argc, char *argv[])
   std::cout << "now let's stop them\n";
   gd.stop = true;
 
-  for (int i = 0; i < workers.size(); i++)
-    {
-      workers[i].join();
-    }
+  std::for_each(workers.begin(), workers.end(), [](auto&& w)
+  {
+    w.join();
+  });
 
   gd.stat.print();
 

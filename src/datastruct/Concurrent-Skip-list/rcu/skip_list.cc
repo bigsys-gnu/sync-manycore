@@ -118,7 +118,7 @@ bool SkipList::add(int key, string value)
       // Map used so that we don't try to acquire lock to a node_t we have already
       // acquired This may happen when we have the same predecessor at different
       // levels
-      vector<unique_lock<recursive_mutex>> locks;
+      vector<unique_lock<mutex>> locks;
 
       // Traverse the skip list and try to acquire the lock of predecessor at
       // every level
@@ -137,7 +137,7 @@ bool SkipList::add(int key, string value)
 
           if (pred != pre_pred)
             {
-              locks.emplace_back(pred->acquire_and_get());
+              locks.emplace_back(unique_lock<mutex>(pred->get_lock()));
               pre_pred = pred;
             }
 
@@ -214,7 +214,7 @@ node_ptr SkipList::remove_impl(int key)
   vector<node_ptr> preds(MAX_LEVEL + 1, nullptr);
   vector<node_ptr> succs(MAX_LEVEL + 1, nullptr);
 
-  node_ptr victim;
+  node_ptr victim = nullptr;
   bool is_marked = false;
   int top_level = -1;
 
@@ -235,14 +235,14 @@ node_ptr SkipList::remove_impl(int key)
 
       // If node not found and the node to be deleted is fully linked and not
       // marked return
-      if(is_marked | (found != -1 && (victim->fully_linked && victim->top_level == size_t(found) && !(victim->marked))))
+      if(is_marked || (found != -1 && (victim->fully_linked && victim->top_level == size_t(found) && !(victim->marked))))
         {
-          unique_lock<recursive_mutex> victim_lock;
+          unique_lock<mutex> victim_lock(victim->get_lock(), defer_lock);
           // If not marked, the we lock the node and mark the node to delete
           if(!is_marked)
             {
               top_level = victim->top_level;
-              victim_lock = victim->acquire_and_get();
+              victim_lock.lock();
               if(victim->marked)
                 {
                   return nullptr;
@@ -255,7 +255,7 @@ node_ptr SkipList::remove_impl(int key)
           // Map used so that we don't try to acquire lock to a node_t we have already
           // acquired This may happen when we have the same predecessor at different
           // levels
-          vector<unique_lock<recursive_mutex>> locks;
+          vector<unique_lock<mutex>> locks;
 
           // Traverse the skip list and try to acquire the lock of predecessor at
           // every level
@@ -274,7 +274,7 @@ node_ptr SkipList::remove_impl(int key)
               succ = succs[level];
               if (pred != pre_pred)
                 {
-                  locks.emplace_back(pred->acquire_and_get());
+                  locks.emplace_back(unique_lock<mutex>(pred->get_lock()));
                   pre_pred = pred;
                 }
 
@@ -297,7 +297,6 @@ node_ptr SkipList::remove_impl(int key)
             }
 
           // delete victim;
-
           return victim;
         }
       else
