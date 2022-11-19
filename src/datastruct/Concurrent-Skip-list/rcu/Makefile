@@ -9,18 +9,16 @@ TARGET = benchmark
 
 
 ${TARGET}: %: %.cc ${C_OBJ} ${CXX_OBJ}
-	$(CXX) $^ -o $@
+	$(CXX) $^ -o $@ $(LIBS)
 
 
 ${CXX_OBJ}: %.o: %.cc
-	$(CXX) -c $< $(LIBS) $(CXXFLAGS)
+	$(CXX) -c $< $(CXXFLAGS)
 
 
 ${C_OBJ}: %.o: %.c
-	$(CC) -c $< $(LIBS) $(CFLAGS)
+	$(CC) -c $< $(CFLAGS)
 
-# port.o: port.cc
-# 	$(CXX) -c $< $(CXXFLAGS) -fpic
 
 clean:
 	rm -f ${C_OBJ} ${CXX_OBJ} ${TARGET}
