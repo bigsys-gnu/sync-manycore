@@ -19,12 +19,12 @@ endif
 CC = gcc
 CXX = g++
 C_OBJ =
-CXX_OBJ =
+CXX_OBJ = mvrlu_api.o
 BIN = main
 
 
-main: main.cc mvrlu
-	$(CXX) -o $@ $< $(LIBS) $(CXXFLAGS) $(INCLUDES) $(LIB_DIR)
+main: main.cc mvrlu mvrlu_api.o
+	$(CXX) -o $@ $< mvrlu_api.o $(LIBS) $(CXXFLAGS) $(INCLUDES) $(LIB_DIR)
 
 
 ${CXX_OBJ}: %.o: %.cc

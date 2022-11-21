@@ -1277,9 +1277,9 @@ static inline int wakeup_qp_thread_for_reclaim(void)
  * External APIs
  */
 
+static int init = 0;
 int __init mvrlu_init(void)
 {
-	static int init = 0;
 	int rc;
 
 	/* Compile time sanity check */
@@ -1309,6 +1309,11 @@ int __init mvrlu_init(void)
 	return 0;
 }
 early_initcall(mvrlu_init);
+
+int mvrlu_is_init(void)
+{
+  return init;
+}
 
 void mvrlu_finish(void)
 {

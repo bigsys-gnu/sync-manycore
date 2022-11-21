@@ -25,6 +25,7 @@ typedef struct mvrlu_thread_struct mvrlu_thread_struct_t;
  * MV-RLU API
  */
 int mvrlu_init(void);
+int mvrlu_is_init(void);
 void mvrlu_finish(void);
 void mvrlu_print_stats(void);
 

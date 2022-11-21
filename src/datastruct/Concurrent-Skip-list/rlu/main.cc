@@ -1,11 +1,10 @@
-#include "mvrlu.h"
+#include "mvrlu_api.hh"
 #include "skip_list.hh"
 
 
 int main(int argc, char *argv[])
 {
-  mvrlu_init();
-  mvrlu_print_stats();
-  
+  mvrlu_api::thread_handle handle;
+
   return 0;
 }
