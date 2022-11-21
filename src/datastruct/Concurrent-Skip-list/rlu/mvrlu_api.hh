@@ -155,6 +155,4 @@ namespace mvrlu_api
     ::mvrlu_finish();
   }
 
-  void regist();   // thread init
-
 } // namespace mvrlu

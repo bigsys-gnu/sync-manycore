@@ -1,16 +1,15 @@
 #include "port_cxx.hh"
-#include "node.hh"
+#include <cstdlib>
 
-void *port_alloc_x(size_t, unsigned int)
+void *port_alloc_x(size_t s, unsigned int)
 {
-  return new node_t();
+  return malloc(s);
 }
 
 void port_free(void *ptr)
 {
   if (ptr != nullptr)
     {
-      auto np = reinterpret_cast<node_ptr>(ptr);
-      delete np;
+      free(ptr);
     }
 }
