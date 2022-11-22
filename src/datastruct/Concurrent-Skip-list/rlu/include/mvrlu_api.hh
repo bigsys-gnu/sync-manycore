@@ -1,4 +1,6 @@
 #pragma once
+#ifndef MVRLU_API_H
+#define MVRLU_API_H
 
 #include "mvrlu.h"
 #include <thread>
@@ -19,7 +21,7 @@
   }                                                                     \
   static void                                                           \
   operator delete(void *p, const std::nothrow_t&) noexcept {            \
-    mvrlu_api::free(p);                                                 \
+    ::mvrlu_free(nullptr, p);                                           \
   }                                                                     \
                                                                         \
   static void                                                           \
@@ -29,13 +31,13 @@
 
 namespace mvrlu_api
 {
-  inline void free(void *ptr)
-  {
-    ::mvrlu_free(NULL, ptr);
-  }
 
-  // call RLU_INIT, RLU_FINISH manually
-  // this mvrlu can be applied only one data structure.
+  // never use these functions directly, instead use derefered pointer class
+  void __obj_free(void *ptr);
+  bool __try_lock(void **p_p_obj, size_t size);
+  bool __try_lock_const(void *obj, size_t size);
+  void *__deref(void *master_node_ptr);
+
   template <typename T>
   void assign_pointer(T **p_ptr, T *obj)
   {
@@ -47,6 +49,51 @@ namespace mvrlu_api
   {
     return ::mvrlu_cmp_ptrs((void *) obj, (void *) obj2);
   }
+
+  // use this derefered_ptr only in single session
+  template <typename T>
+  class derefered_ptr
+  {
+    T *self_{nullptr}; // dereferenced pointer
+  public:
+    derefered_ptr(T* master_node_ptr) // initialize with master node pointer!
+    {
+      self_ = reinterpret_cast<T*>(__deref(master_node_ptr));
+    }
+
+    derefered_ptr(derefered_ptr& ptr)
+    {
+      self_ = ptr.self_;
+    }
+
+    bool try_lock()
+    {
+      return __try_lock(reinterpret_cast<void **>(&self_), sizeof(T));
+    }
+
+    bool try_lock_const()
+    {
+      return __try_lock_const(reinterpret_cast<void *>(self_), sizeof(T));
+    }
+
+    T* operator* ()
+    {
+      return *self_;
+    }
+
+    T* operator-> ()
+    {
+      return *self_;
+    }
+
+    void free()
+    {
+      __obj_free(reinterpret_cast<void *>(self_));
+      self_ = nullptr;
+    }
+  };
+
+  std::thread create_thread(const std::function<void()>&& worker);
 
   template <typename T>
   void *alloc()
@@ -76,6 +123,6 @@ namespace mvrlu_api
       ::mvrlu_finish();
     }
   };
-
-  std::thread create_thread(const std::function<void()>&& worker);
 } // namespace mvrlu
+
+#endif /* MVRLU_API_H */

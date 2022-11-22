@@ -1,10 +1,12 @@
 #include "mvrlu_api.hh"
 #include "mvrlu_i.h"
 
-using namespace mvrlu_api;
-
 namespace mvrlu_api
 {
+  void __obj_free(void *ptr);
+  bool __try_lock(void **p_p_obj, size_t size);
+  bool __try_lock_const(void *obj, size_t size);
+  void *__deref(void *master_node_ptr);
   class thread_handle
   {
     friend class session;
@@ -19,6 +21,11 @@ namespace mvrlu_api
       ::mvrlu_reader_unlock(self_);
     }
 
+    void mvrlu_abort(void)
+    {
+      ::mvrlu_abort(self_);
+    }
+
   public:
     thread_handle(void);
 
@@ -26,26 +33,19 @@ namespace mvrlu_api
 
     void operator=(thread_handle&&);
 
-    template <typename T>
-    bool try_lock(T **p_p_obj)
+    bool try_lock(void **p_p_obj, size_t size)
     {
       if(!*p_p_obj)
         return true;
-      return ::_mvrlu_try_lock(self_, (void **) p_p_obj, sizeof(T));
+      return ::_mvrlu_try_lock(self_, (void **) p_p_obj, size);
     }
 
-    template <typename T>
-    bool try_lock_const(T *obj)
+    bool try_lock_const(void *obj, size_t size)
     {
       if(!obj)
         return true;
 
-      return ::_mvrlu_try_lock_const(self_, (void *) obj, sizeof(T));
-    }
-
-    void mvrlu_abort(void)
-    {
-      ::mvrlu_abort(self_);
+      return ::_mvrlu_try_lock_const(self_, (void *) obj, size);
     }
 
     template <typename T>
@@ -73,6 +73,9 @@ namespace mvrlu_api
     mvrlu_thread_struct_t *self_;
   };
 }
+
+
+using namespace mvrlu_api;
 
 thread_handle::thread_handle()
 {
@@ -128,4 +131,24 @@ session::~session()
     {
       handle.mvrlu_reader_unlock();
     }
+}
+
+void mvrlu_api::__obj_free(void *ptr)
+{
+  handle.mvrlu_free(ptr);
+}
+
+bool mvrlu_api::__try_lock(void **p_p_obj, size_t size)
+{
+  return handle.try_lock(p_p_obj, size);
+}
+
+bool mvrlu_api::__try_lock_const(void *obj, size_t size)
+{
+  return handle.try_lock_const(obj, size);
+}
+
+void * mvrlu_api::__deref(void *master_node_ptr)
+{
+  return handle.mvrlu_deref(master_node_ptr);
 }
