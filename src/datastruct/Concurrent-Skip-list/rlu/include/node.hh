@@ -5,6 +5,7 @@
 #include <atomic>
 #include <array>
 #include <utility>
+#include "mvrlu_api.hh"
 
 using namespace std;
 
@@ -14,6 +15,9 @@ class Node
   int key_{0};
 
 public:
+
+  MVRLU_NEW_DELETE(Node<L>)
+
   // Stores the reference of the next node until the top level for the node
   array<Node *, L> next {nullptr};
 

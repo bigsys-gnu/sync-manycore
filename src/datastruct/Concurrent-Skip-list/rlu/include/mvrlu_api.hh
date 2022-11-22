@@ -8,18 +8,18 @@
 #define MVRLU_NEW_DELETE(CLASS_NAME)                                    \
   static void*                                                          \
   operator new(unsigned long nbytes, const std::nothrow_t&) noexcept {  \
-    return mvrlu::mvrlu_alloc<CLASS_NAME>();                            \
+    return mvrlu_api::alloc<CLASS_NAME>();                              \
   }                                                                     \
   static void*                                                          \
   operator new(unsigned long nbytes) {                                  \
     void *p = CLASS_NAME::operator new(nbytes, std::nothrow);           \
     if (p == nullptr)                                                   \
-      throw_bad_alloc();                                                \
+      throw std::bad_alloc();                                           \
     return p;                                                           \
   }                                                                     \
   static void                                                           \
   operator delete(void *p, const std::nothrow_t&) noexcept {            \
-    mvrlu::mvrlu_free(p);                                               \
+    mvrlu_api::free(p);                                                 \
   }                                                                     \
                                                                         \
   static void                                                           \
@@ -49,9 +49,9 @@ namespace mvrlu_api
   }
 
   template <typename T>
-  T *alloc(void)
+  void *alloc()
   {
-    return (T *) ::mvrlu_alloc(sizeof(T));
+    return ::mvrlu_alloc(sizeof(T));
   }
 
   class session
