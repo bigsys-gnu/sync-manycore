@@ -8,6 +8,7 @@
 #include <condition_variable>
 #include <vector>
 #include "skip_list.hh"
+#include "mvrlu_api.hh"
 
 struct statistics
 {
@@ -85,12 +86,13 @@ void worker(global_data& gd)
 
 int main(int argc, char *argv[])
 {
+  mvrlu_api::system mvrlu_system;
   global_data gd;
   std::vector<std::thread> workers;
 
   for (size_t i = 0; i < gd.thread_num; i++)
     {
-      workers.emplace_back(std::thread([&gd]()
+      workers.emplace_back(mvrlu_api::create_thread([&gd]()
       {
         worker(gd);
       }));
@@ -98,7 +100,7 @@ int main(int argc, char *argv[])
 
   std::this_thread::sleep_for(std::chrono::seconds(1));
   gd.condvar.notify_all();
-  std::this_thread::sleep_for(std::chrono::seconds(30));
+  std::this_thread::sleep_for(std::chrono::seconds(10));
   std::cout << "now let's stop them\n";
   gd.stop = true;
 

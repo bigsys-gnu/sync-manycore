@@ -73,11 +73,13 @@ namespace mvrlu_api
     derefered_ptr operator = (derefered_ptr& o)
     {
       self_ = o.self_;
+      return { *this };
     }
 
     derefered_ptr operator = (T* master_node_ptr) // use this carefully
     {
       self_ = reinterpret_cast<T*>(__deref(master_node_ptr));
+      return { *this };
     }
 
     bool operator == (const derefered_ptr& o) const
@@ -107,7 +109,7 @@ namespace mvrlu_api
 
     T* operator-> ()
     {
-      return *self_;
+      return self_;
     }
 
     void free()

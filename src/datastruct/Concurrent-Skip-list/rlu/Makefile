@@ -19,12 +19,12 @@ endif
 CC = gcc
 CXX = g++
 C_OBJ =
-CXX_OBJ = mvrlu_api.o
-BIN = main
+CXX_OBJ = mvrlu_api.o skip_list.o
+BIN = benchmark
 
 
-main: main.cc mvrlu mvrlu_api.o
-	$(CXX) -o $@ $< mvrlu_api.o $(LIBS) $(CXXFLAGS) $(INCLUDES) $(LIB_DIR)
+benchmark: benchmark.cc mvrlu $(CXX_OBJ)
+	$(CXX) -o $@ $< $(CXX_OBJ) $(LIBS) $(CXXFLAGS) $(INCLUDES) $(LIB_DIR)
 
 
 ${CXX_OBJ}: %.o: %.cc
