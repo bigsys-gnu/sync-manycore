@@ -11,6 +11,7 @@ CFLAGS += -pthread
 
 ifdef DEBUG
 	CFLAGS += -O0 -g3
+	CXXFLAGS += -O0 -g3
 else
 	CFLAGS += -DNDEBUG
 	CFLAGS += -O1 -g
