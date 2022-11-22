@@ -56,6 +56,10 @@ namespace mvrlu_api
   {
     T *self_{nullptr}; // dereferenced pointer
   public:
+    derefered_ptr()
+    {
+    }
+
     derefered_ptr(T* master_node_ptr) // initialize with master node pointer!
     {
       self_ = reinterpret_cast<T*>(__deref(master_node_ptr));
@@ -64,6 +68,26 @@ namespace mvrlu_api
     derefered_ptr(derefered_ptr& ptr)
     {
       self_ = ptr.self_;
+    }
+
+    derefered_ptr operator = (derefered_ptr& o)
+    {
+      self_ = o.self_;
+    }
+
+    derefered_ptr operator = (T* master_node_ptr) // use this carefully
+    {
+      self_ = reinterpret_cast<T*>(__deref(master_node_ptr));
+    }
+
+    bool operator == (const derefered_ptr& o) const
+    {
+      return self_ == o.self_;
+    }
+
+    bool operator != (const derefered_ptr& o) const
+    {
+      return self_ != o.self_;
     }
 
     bool try_lock()
@@ -76,7 +100,7 @@ namespace mvrlu_api
       return __try_lock_const(reinterpret_cast<void *>(self_), sizeof(T));
     }
 
-    T* operator* ()
+    T& operator* ()
     {
       return *self_;
     }

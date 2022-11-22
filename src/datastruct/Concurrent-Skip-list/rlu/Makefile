@@ -36,11 +36,11 @@ ${C_OBJ}: %.o: %.c
 
 
 # C libraries
-rlu.o: ./lib/rlu.c ./include/rlu.h
+rlu.o: rlu.c
 	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -c -o $@ $<
 
 
-rlu-ordo.o: ./lib/rlu.c ./include/rlu.h
+rlu-ordo.o: rlu.c
 	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -DRLU_ORDO_TIMESTAMPING -c -o $@ $<
 
 

@@ -3,6 +3,8 @@
 #include <map>
 #include "node.hh"
 
+using deref_ptr = mvrlu_api::derefered_ptr<node_t>;
+
 class SkipList
 {
 private:
@@ -10,7 +12,7 @@ private:
   node_ptr head_{nullptr};
   node_ptr tail_{nullptr};
 
-  int find(int key, vector<node_ptr> &predecessors, vector<node_ptr> &successors);
+  int find(int key, vector<deref_ptr> &predecessors, vector<deref_ptr> &successors);
   int get_random_level();
 
 public:
