@@ -84,12 +84,12 @@ namespace mvrlu_api
 
     bool operator == (const derefered_ptr& o) const
     {
-      return self_ == o.self_;
+      return ::mvrlu_cmp_ptrs(self_, o.self_);
     }
 
     bool operator != (const derefered_ptr& o) const
     {
-      return self_ != o.self_;
+      return !(*this == o);
     }
 
     bool try_lock()

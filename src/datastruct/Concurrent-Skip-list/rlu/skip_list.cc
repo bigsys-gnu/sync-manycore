@@ -100,21 +100,29 @@ restart:
     {
       if (pre_pred != preds[level])
         {
-          pre_pred = preds[level];
           if (!preds[level].try_lock())
             {
               session.abort();
               goto restart;
             }
+          pre_pred = preds[level];
+        }
+      else
+        {
+          preds[level] = pre_pred;
         }
       if (pre_succ != succs[level])
         {
-          pre_succ = succs[level];
           if (!succs[level].try_lock_const())
             {
               session.abort();
               goto restart;
             }
+          pre_succ = succs[level];
+        }
+      else
+        {
+          succs[level] = pre_succ;
         }
     }
 
@@ -188,12 +196,16 @@ restart:
     {
       if (pre_pred != preds[level])
         {
-          pre_pred = preds[level];
           if (!preds[level].try_lock())
             {
               session.abort();
               goto restart;
             }
+          pre_pred = preds[level];
+        }
+      else
+        {
+          preds[level] = pre_pred;
         }
     }
 
