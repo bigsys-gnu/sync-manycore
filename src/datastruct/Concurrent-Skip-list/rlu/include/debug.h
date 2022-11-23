@@ -8,7 +8,7 @@
 
 //#define MVRLU_ENABLE_ASSERT
 //#define MVRLU_ENABLE_FREE_POISIONING
-#define MVRLU_ENABLE_STATS
+/* #define MVRLU_ENABLE_STATS */
 //#define MVRLU_TIME_MEASUREMENT
 #define MVRLU_ATTACH_GDB_ASSERT_FAIL                                           \
 	0 /* attach gdb at MVRLU_ASSERT() failure */
