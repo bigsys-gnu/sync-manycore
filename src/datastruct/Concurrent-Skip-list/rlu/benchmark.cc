@@ -86,8 +86,8 @@ void worker(global_data& gd)
 
 int main(int argc, char *argv[])
 {
-  mvrlu_api::system mvrlu_system;
   global_data gd;
+  mvrlu_api::system mvrlu_system;
   std::vector<std::thread> workers;
 
   for (size_t i = 0; i < gd.thread_num; i++)
