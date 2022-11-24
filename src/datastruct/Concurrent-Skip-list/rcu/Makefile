@@ -1,4 +1,5 @@
 LIBS = -pthread
+TCLAP = -I../tclap/include/		# header only option parser
 CXXFLAGS = -Wall -std=c++17
 CFLSGS = -Wall
 CC = gcc
@@ -9,7 +10,7 @@ TARGET = benchmark
 
 
 ${TARGET}: %: %.cc ${C_OBJ} ${CXX_OBJ}
-	$(CXX) $^ -o $@ $(LIBS)
+	$(CXX) $^ -o $@ $(LIBS) $(TCLAP)
 
 
 ${CXX_OBJ}: %.o: %.cc

@@ -11,6 +11,7 @@
 #include <algorithm>
 #include "rcu_api.hh"
 #include "skip_list.hh"
+#include "tclap/CmdLine.h"
 
 struct statistics
 {
@@ -88,11 +89,26 @@ void worker(global_data& gd)
   gather_stat(gd, local_stat);
 }
 
-
 int main(int argc, char *argv[])
 {
   global_data gd;
   std::vector<std::thread> workers;
+  TCLAP::CmdLine cmd("rcu benchmark options");
+  TCLAP::ValueArg<unsigned int> thread_num("t", "thread_num",
+                                           "the number of workers", true, 1u, "");
+  TCLAP::ValueArg<unsigned int> duration("d", "benchmark_time",
+                                         "benchmark duration in seconds", true, 10u, "");
+  TCLAP::ValueArg<int> value_range("r", "value_range",
+                                   "skiplist key range from 0", true, 100000, "");
+
+  cmd.add(thread_num);
+  cmd.add(duration);
+  cmd.add(value_range);
+  cmd.parse(argc, argv);
+
+  gd.key_dist = std::uniform_int_distribution<int>(1, value_range.getValue());
+  gd.thread_num = thread_num.getValue();
+
   rcu_api::init(gd.thread_num);
 
   for (int i = 0; i < gd.thread_num; i++)
@@ -105,7 +121,7 @@ int main(int argc, char *argv[])
 
   std::this_thread::sleep_for(std::chrono::seconds(1));
   gd.condvar.notify_all();
-  std::this_thread::sleep_for(std::chrono::seconds(30));
+  std::this_thread::sleep_for(std::chrono::seconds(duration.getValue()));
   std::cout << "now let's stop them\n";
   gd.stop = true;
 
