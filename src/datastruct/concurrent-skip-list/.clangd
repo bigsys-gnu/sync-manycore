@@ -1,0 +1,6 @@
+CompileFlags:
+  Add: [
+  -std=c++17,
+  -I/home/madplayer/GIT/sync-manycore/src/datastruct/concurrent-skip-list,
+  ]
+
