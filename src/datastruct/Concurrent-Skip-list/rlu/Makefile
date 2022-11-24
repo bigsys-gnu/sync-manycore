@@ -1,6 +1,7 @@
 LIBS = -lmvrlu-ordo
 CXXFLAGS = -Wall -std=c++17 -pthread
 INCLUDES := -I./include
+TCLAP = -I../tclap/include/		# header only option parser
 LIB_DIR := -L./lib
 
 CFLSGS = -Wall
@@ -25,7 +26,7 @@ BIN = benchmark
 
 
 benchmark: benchmark.cc mvrlu $(CXX_OBJ)
-	$(CXX) -o $@ $< $(CXX_OBJ) $(LIBS) $(CXXFLAGS) $(INCLUDES) $(LIB_DIR)
+	$(CXX) -o $@ $< $(CXX_OBJ) $(LIBS) $(CXXFLAGS) $(INCLUDES) $(LIB_DIR) $(TCLAP)
 
 
 ${CXX_OBJ}: %.o: %.cc

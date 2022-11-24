@@ -9,6 +9,7 @@
 #include <vector>
 #include "skip_list.hh"
 #include "mvrlu_api.hh"
+#include "tclap/CmdLine.h"
 
 struct statistics
 {
@@ -87,6 +88,23 @@ void worker(global_data& gd)
 int main(int argc, char *argv[])
 {
   global_data gd;
+  TCLAP::CmdLine cmd("MV-RLU benchmark options");
+  TCLAP::ValueArg<unsigned int> thread_num("t", "thread_num",
+                                           "the number of workers", true, 1u, "");
+  TCLAP::ValueArg<unsigned int> duration("d", "benchmark_time",
+                                         "benchmark duration in seconds", true, 10u, "");
+  TCLAP::ValueArg<int> value_range("r", "value_range",
+                                   "skiplist key range from 0", true, 100000, "");
+
+  cmd.add(thread_num);
+  cmd.add(duration);
+  cmd.add(value_range);
+  cmd.parse(argc, argv);
+
+  gd.key_dist = std::uniform_int_distribution<int>(1, value_range.getValue());
+  gd.thread_num = thread_num.getValue();
+
+
   mvrlu_api::system mvrlu_system;
   std::vector<std::thread> workers;
 
@@ -100,7 +118,7 @@ int main(int argc, char *argv[])
 
   std::this_thread::sleep_for(std::chrono::seconds(1));
   gd.condvar.notify_all();
-  std::this_thread::sleep_for(std::chrono::seconds(10));
+  std::this_thread::sleep_for(std::chrono::seconds(duration.getValue()));
   std::cout << "now let's stop them\n";
   gd.stop = true;
 
