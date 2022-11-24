@@ -1,6 +1,5 @@
 #pragma once
 
-#include <map>
 #include <vector>
 #include "node.hh"
 
@@ -20,9 +19,9 @@ public:
   ~SkipList();
 
   // Supported operations
-  bool add(int key, string value);
-  string search(int key);
+  bool add(int key);
+  bool search(int key);
   bool remove(int key);
-  map<int, string> range(int start_key, int end_key);
+  vector<int> range(int start_key, int end_key);
   void display();
 };

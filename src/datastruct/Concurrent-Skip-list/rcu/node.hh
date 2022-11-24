@@ -11,8 +11,7 @@ using namespace std;
 template <size_t L>
 class Node
 {
-  // Stores the key and value for the Node
-  pair<int, string> key_value_pair_;
+  int key_;
 
   // Lock to lock the node when modifing it
   recursive_mutex lock_;
@@ -35,7 +34,6 @@ public:
   Node(int key, string value, size_t top_level);
   ~Node();
   int get_key();
-  string get_value();
 
   recursive_mutex& get_lock()
   {
@@ -53,14 +51,7 @@ template <size_t L>
 Node<L>::Node(int key, size_t top_level):
   top_level(top_level)
 {
-  key_value_pair_ = make_pair(key, "");
-}
-
-template <size_t L>
-Node<L>::Node(int key, string value, size_t top_level):
-  top_level(top_level)
-{
-  key_value_pair_ = make_pair(key, value);
+  key_ = key;
 }
 
 /**
@@ -69,16 +60,7 @@ Node<L>::Node(int key, string value, size_t top_level):
 template <size_t L>
 int Node<L>::get_key()
 {
-  return key_value_pair_.first;
-}
-
-/**
-    Returns the value in the node
-*/
-template <size_t L>
-string Node<L>::get_value()
-{
-  return key_value_pair_.second;
+  return key_;
 }
 
 template <size_t L>

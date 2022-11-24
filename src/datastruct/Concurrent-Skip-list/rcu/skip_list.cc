@@ -81,7 +81,7 @@ int SkipList::get_random_level()
     Inserts into the Skip list at the appropriate place using locks.
     Return if already exists.
 */
-bool SkipList::add(int key, string value)
+bool SkipList::add(int key)
 {
   // Get the level until which the new node must be available
   int top_level = get_random_level();
@@ -156,7 +156,7 @@ bool SkipList::add(int key, string value)
 
       // All conditions satisfied, create the node_t and insert it as we have all
       // the required locks
-      node_ptr new_node = new node_t(key, value, top_level);
+      node_ptr new_node = new node_t(key, top_level);
 
       // Update the predecessor and successors
       for(int level = 0; level <= top_level; level++)
@@ -175,7 +175,7 @@ bool SkipList::add(int key, string value)
     Performs search to find if a node exists.
     Return value if the key found, else return empty
 */
-string SkipList::search(int key)
+bool SkipList::search(int key)
 {
 
   // Finds the predecessor and successors
@@ -189,7 +189,7 @@ string SkipList::search(int key)
   // If not found return empty.
   if(found == -1)
     {
-      return "";
+      return false;
     }
 
   auto curr = succs[found];
@@ -197,11 +197,11 @@ string SkipList::search(int key)
   // If found, unmarked and fully linked, then return value. Else return empty.
   if(curr->fully_linked && !curr->marked)
     {
-      return curr->get_value();
+      return true;
     }
   else
     {
-      return "";
+      return false;
     }
 }
 
@@ -328,9 +328,9 @@ bool SkipList::remove(int key)
    start_key and end_key. If search exceeds end, then abort Updates and returns
    the key value pairs in a map.
 */
-map<int, string> SkipList::range(int start_key, int end_key)
+vector<int> SkipList::range(int start_key, int end_key)
 {
-  map<int, string> range_output;
+  vector<int> range_output;
 
   if(start_key > end_key)
     {
@@ -347,7 +347,7 @@ map<int, string> SkipList::range(int start_key, int end_key)
         {
           if(curr->get_key() >= start_key && curr->get_key() <= end_key)
             {
-              range_output.insert(make_pair(curr->get_key(), curr->get_value()));
+              range_output.push_back(curr->get_key());
             }
           curr = curr->next[level];
         }
@@ -357,7 +357,7 @@ map<int, string> SkipList::range(int start_key, int end_key)
     {
       if(curr->get_key() >= start_key && curr->get_key() <= end_key)
         {
-          range_output.insert(make_pair(curr->get_key(), curr->get_value()));
+          range_output.push_back(curr->get_key());
         }
       curr = curr->next[0];
     }

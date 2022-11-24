@@ -64,13 +64,12 @@ void worker(global_data& gd)
   while (!gd.stop)
     {
       auto op = gd.dist(gd.engine);
-      auto data = "hello RCU";
       auto key = gd.key_dist(gd.engine);
 
       switch (op)
         {
         case 1:
-          gd.skiplist.add(key, data);
+          gd.skiplist.add(key);
           local_stat.add++;
           break;
         case 2:
