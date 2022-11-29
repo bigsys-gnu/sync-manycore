@@ -25,6 +25,7 @@ CFLAGS += -Wno-unused-function -Wno-packed-not-aligned
 # CFALGS += -DMVRLU_DISABLE_ADDR_ACTUAL_TYPE_CHECKING
 
 CXXFLAGS += -I$(INC_DIR)
+CXXFLAGS += -O3
 
 LDFLAGS += -lpthread $(MEMMGR)
 
