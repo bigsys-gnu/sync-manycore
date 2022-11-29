@@ -1,5 +1,7 @@
+#include <memory>
 #include "mvrlu_api.hh"
-#include "mvrlu_i.h"
+
+struct mvrlu_thread_struct;
 
 namespace mvrlu_api
 {
@@ -70,7 +72,7 @@ namespace mvrlu_api
     }
 
   private:
-    mvrlu_thread_struct_t *self_;
+    struct mvrlu_thread_struct *self_;
   };
 }
 
@@ -102,53 +104,54 @@ void thread_handle::operator=(thread_handle &&o)
   o.self_ = nullptr;
 }
 
-thread_local thread_handle handle;
+thread_local thread_handle *handle;
 
 std::thread
 mvrlu_api::create_thread(const std::function<void ()> &&worker)
 {
   return std::thread([&]()
   {
-    handle = thread_handle();
+    auto ptr = std::make_unique<thread_handle>();
+    handle = ptr.get();
     worker();
   });
 }
 
 session::session()
 {
-  handle.mvrlu_reader_lock();
+  handle->mvrlu_reader_lock();
 }
 
 void session::abort()
 {
   abort_ = true;
-  handle.mvrlu_abort();
+  handle->mvrlu_abort();
 }
 
 session::~session()
 {
   if (!abort_)
     {
-      handle.mvrlu_reader_unlock();
+      handle->mvrlu_reader_unlock();
     }
 }
 
 void mvrlu_api::__obj_free(void *ptr)
 {
-  handle.mvrlu_free(ptr);
+  handle->mvrlu_free(ptr);
 }
 
 bool mvrlu_api::__try_lock(void **p_p_obj, size_t size)
 {
-  return handle.try_lock(p_p_obj, size);
+  return handle->try_lock(p_p_obj, size);
 }
 
 bool mvrlu_api::__try_lock_const(void *obj, size_t size)
 {
-  return handle.try_lock_const(obj, size);
+  return handle->try_lock_const(obj, size);
 }
 
 void * mvrlu_api::__deref(void *master_node_ptr)
 {
-  return handle.mvrlu_deref(master_node_ptr);
+  return handle->mvrlu_deref(master_node_ptr);
 }
