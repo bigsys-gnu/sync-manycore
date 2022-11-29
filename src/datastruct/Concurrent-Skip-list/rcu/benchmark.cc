@@ -30,9 +30,7 @@ struct statistics
 struct global_data
 {
   unsigned int thread_num{8};
-  std::default_random_engine engine;
-  std::uniform_int_distribution<unsigned int> dist = std::uniform_int_distribution<unsigned int>(1, 3);
-  std::uniform_int_distribution<int> key_dist = std::uniform_int_distribution<int>(1, 1000000);
+  int key_max{1000000};
   std::mutex cond_lock;
   std::condition_variable condvar;
   std::mutex stat_lock;
@@ -52,8 +50,12 @@ void gather_stat(global_data& gd, const statistics& local)
 
 void worker(global_data& gd)
 {
+  std::default_random_engine engine{std::random_device{}()};
+  std::uniform_int_distribution<unsigned int> dist(1, 3);
+  std::uniform_int_distribution<int> key_dist(1, gd.key_max);
   rcu_api::regist();
   std::cout << "registered\n";
+
   std::unique_lock<std::mutex> lk(gd.cond_lock); // hold lock
   std::cout << "sleep for cond\n";
   gd.condvar.wait(lk);
@@ -63,8 +65,8 @@ void worker(global_data& gd)
   statistics local_stat;
   while (!gd.stop)
     {
-      auto op = gd.dist(gd.engine);
-      auto key = gd.key_dist(gd.engine);
+      auto op = dist(engine);
+      auto key = key_dist(engine);
 
       switch (op)
         {
@@ -105,7 +107,7 @@ int main(int argc, char *argv[])
   cmd.add(value_range);
   cmd.parse(argc, argv);
 
-  gd.key_dist = std::uniform_int_distribution<int>(1, value_range.getValue());
+  gd.key_max = value_range.getValue();
   gd.thread_num = thread_num.getValue();
 
   rcu_api::init(gd.thread_num);
