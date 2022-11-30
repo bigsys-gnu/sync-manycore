@@ -136,16 +136,16 @@ namespace mvrlu_api
       self_ = ptr.self_;
     }
 
-    derefered_ptr operator = (derefered_ptr& o)
+    derefered_ptr& operator = (const derefered_ptr& o)
     {
       self_ = o.self_;
-      return { *this };
+      return *this;
     }
 
-    derefered_ptr operator = (T* master_node_ptr) // use this carefully
+    derefered_ptr& operator = (T* master_node_ptr) // use this carefully
     {
       self_ = reinterpret_cast<T*>(get_handle().mvrlu_deref(master_node_ptr));
-      return { *this };
+      return *this;
     }
 
     bool operator == (const derefered_ptr& o) const
@@ -168,12 +168,12 @@ namespace mvrlu_api
       return get_handle().try_lock_const(reinterpret_cast<void *>(self_), sizeof(T));
     }
 
-    T& operator* ()
+    T& operator* () const
     {
       return *self_;
     }
 
-    T* operator-> ()
+    T* operator-> () const
     {
       return self_;
     }
@@ -183,6 +183,12 @@ namespace mvrlu_api
       get_handle().mvrlu_free(reinterpret_cast<void *>(self_));
       self_ = nullptr;
     }
+
+    T* get() const
+    {
+      return self_;
+    }
+
   };
 
   std::thread create_thread(const std::function<void()>&& worker);

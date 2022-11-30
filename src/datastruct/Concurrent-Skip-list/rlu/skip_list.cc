@@ -133,7 +133,7 @@ restart:
   // Insert
   for(int level = 0; level <= top_level; level++)
     {
-      mvrlu_api::assign_pointer(&new_node->next[level], &*succs[level]);
+      mvrlu_api::assign_pointer(&new_node->next[level], succs[level].get());
       mvrlu_api::assign_pointer(&preds[level]->next[level], new_node);
     }
 
