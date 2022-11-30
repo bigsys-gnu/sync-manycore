@@ -313,7 +313,6 @@ bool SkipList::remove(int key)
   auto victim = remove_impl(key);
   if (victim != nullptr)
     {
-      rcu_api::writer_scope write_session;
       // rcu_api::synchronize();
       // delete victim;
       rcu_api::free(reinterpret_cast<void *>(victim));
