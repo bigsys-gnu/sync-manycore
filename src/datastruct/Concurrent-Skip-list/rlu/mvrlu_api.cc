@@ -18,7 +18,7 @@ thread_handle::~thread_handle(void)
   if(self_)
     {
       ::mvrlu_thread_finish(self_);
-      // ::mvrlu_thread_free(self_);
+      ::mvrlu_thread_free(self_);
     }
 }
 
