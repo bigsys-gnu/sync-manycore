@@ -16,7 +16,7 @@ ifdef DEBUG
 else
 	CFLAGS += -DNDEBUG
 	CFLAGS += -O1 -g
-	CXXFLAGS += -O1 -g
+	CXXFLAGS += -O1 -g -finline-functions
 endif
 
 CC = gcc
