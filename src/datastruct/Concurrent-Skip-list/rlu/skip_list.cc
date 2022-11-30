@@ -9,6 +9,7 @@
 #include <limits>
 #include <cstdio>
 #include <cstdlib>
+#include <algorithm>
 
 constexpr const auto INT_MINI = numeric_limits<int>::min();
 constexpr const auto INT_MAXI = numeric_limits<int>::max();
@@ -18,10 +19,10 @@ SkipList::SkipList()
   head_ = new node_t(INT_MINI, MAX_LEVEL);
   tail_ = new node_t(INT_MAXI, MAX_LEVEL);
 
-  for (auto iter = head_->next.begin(); iter != head_->next.end(); iter++)
-    {
-      *iter = tail_;
-    }
+  std::for_each(head_->next.begin(), head_->next.end(), [this](auto& next)
+  {
+    next = tail_;
+  });
 }
 
 /*
