@@ -31,12 +31,78 @@
 
 namespace mvrlu_api
 {
+  class thread_handle
+  {
+    friend class session;
 
-  // never use these functions directly, instead use derefered pointer class
-  void __obj_free(void *ptr);
-  bool __try_lock(void **p_p_obj, size_t size);
-  bool __try_lock_const(void *obj, size_t size);
-  void *__deref(void *master_node_ptr);
+    void mvrlu_reader_lock(void)
+    {
+      ::mvrlu_reader_lock(self_);
+    }
+
+    void mvrlu_reader_unlock(void)
+    {
+      ::mvrlu_reader_unlock(self_);
+    }
+
+    void mvrlu_abort(void)
+    {
+      ::mvrlu_abort(self_);
+    }
+
+  public:
+    thread_handle(void);
+
+    ~thread_handle(void);
+
+    void operator=(thread_handle&&);
+
+    bool try_lock(void **p_p_obj, size_t size)
+    {
+      if(!*p_p_obj)
+        return true;
+      return ::_mvrlu_try_lock(self_, (void **) p_p_obj, size);
+    }
+
+    bool try_lock_const(void *obj, size_t size)
+    {
+      if(!obj)
+        return true;
+
+      return ::_mvrlu_try_lock_const(self_, (void *) obj, size);
+    }
+
+    template <typename T>
+    T *mvrlu_deref(T *p_obj)
+    {
+      return (T *) ::mvrlu_deref(self_, (void *) p_obj);
+    }
+
+    // need hotfix!!!
+    // - how to call deleter of p_obj properly
+    // 1. mvrlu.c don't know p_obj is which type.
+    // -> mvrlu.c need to be fixed using template?
+    template <typename T>
+    void mvrlu_free(T *p_obj)
+    {
+      ::mvrlu_free(self_, (void *) p_obj);
+    }
+
+    void mvrlu_flush_log(void)
+    {
+      ::mvrlu_flush_log(self_);
+    }
+
+  private:
+    struct mvrlu_thread_struct *self_;
+  };
+
+  inline thread_local thread_handle * handle;
+
+  inline thread_handle& get_handle()
+  {
+    return *handle;
+  }
 
   template <typename T>
   void assign_pointer(T **p_ptr, T *obj)
@@ -62,7 +128,7 @@ namespace mvrlu_api
 
     derefered_ptr(T* master_node_ptr) // initialize with master node pointer!
     {
-      self_ = reinterpret_cast<T*>(__deref(master_node_ptr));
+      self_ = reinterpret_cast<T*>(get_handle().mvrlu_deref(master_node_ptr));
     }
 
     derefered_ptr(derefered_ptr& ptr)
@@ -78,7 +144,7 @@ namespace mvrlu_api
 
     derefered_ptr operator = (T* master_node_ptr) // use this carefully
     {
-      self_ = reinterpret_cast<T*>(__deref(master_node_ptr));
+      self_ = reinterpret_cast<T*>(get_handle().mvrlu_deref(master_node_ptr));
       return { *this };
     }
 
@@ -94,12 +160,12 @@ namespace mvrlu_api
 
     bool try_lock()
     {
-      return __try_lock(reinterpret_cast<void **>(&self_), sizeof(T));
+      return get_handle().try_lock(reinterpret_cast<void **>(&self_), sizeof(T));
     }
 
     bool try_lock_const()
     {
-      return __try_lock_const(reinterpret_cast<void *>(self_), sizeof(T));
+      return get_handle().try_lock_const(reinterpret_cast<void *>(self_), sizeof(T));
     }
 
     T& operator* ()
@@ -114,7 +180,7 @@ namespace mvrlu_api
 
     void free()
     {
-      __obj_free(reinterpret_cast<void *>(self_));
+      get_handle().mvrlu_free(reinterpret_cast<void *>(self_));
       self_ = nullptr;
     }
   };
@@ -131,9 +197,22 @@ namespace mvrlu_api
   {
     bool abort_{false};
   public:
-    session();
-    void abort();
-    ~session();
+    session()
+    {
+      get_handle().mvrlu_reader_lock();
+    }
+    void abort()
+    {
+      abort_ = true;
+      get_handle().mvrlu_abort();
+    }
+    ~session()
+    {
+      if (!abort_)
+        {
+          get_handle().mvrlu_reader_unlock();
+        }
+    }
   };
 
   class system
