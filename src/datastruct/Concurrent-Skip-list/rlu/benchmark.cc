@@ -11,6 +11,10 @@
 #include "mvrlu_api.hh"
 #include "tclap/CmdLine.h"
 
+#ifdef MVRLU_ENABLE_STATS
+#include "mvrlu.h"
+#endif
+
 struct statistics
 {
   size_t add{0};
@@ -105,6 +109,10 @@ int main(int argc, char *argv[])
   gd.key_max = value_range.getValue();
   gd.thread_num = thread_num.getValue();
 
+  #ifdef MVRLU_ENABLE_STATS
+  {
+  #endif
+
   mvrlu_api::system mvrlu_system;
   std::vector<std::thread> workers;
 
@@ -128,6 +136,11 @@ int main(int argc, char *argv[])
     }
 
   gd.stat.print();
+
+  #ifdef MVRLU_ENABLE_STATS
+  } // end benchmark
+  mvrlu_print_stats();
+  #endif
 
   return 0;
 }

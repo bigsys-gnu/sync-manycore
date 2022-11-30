@@ -20,6 +20,11 @@ else
 	CXXFLAGS += -O1 -g
 endif
 
+ifdef TRACE
+TRACE_MACRO += TRACE=true
+CXXFLAGS += -DMVRLU_ENABLE_STATS
+endif
+
 CC = gcc
 CXX = g++
 C_OBJ =
@@ -49,7 +54,7 @@ rlu-ordo.o: rlu.c
 
 
 mvrlu:
-	$(MAKE) -C ./lib/
+	$(MAKE) -C ./lib/ ${TRACE_MACRO}
 
 
 numa-config.h:

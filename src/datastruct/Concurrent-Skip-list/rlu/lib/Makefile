@@ -24,6 +24,10 @@ CFLAGS += -Wno-unused-parameter -Wno-unused-value
 CFLAGS += -Wno-unused-function -Wno-packed-not-aligned
 # CFALGS += -DMVRLU_DISABLE_ADDR_ACTUAL_TYPE_CHECKING
 
+ifdef TRACE
+CFLAGS += -DMVRLU_ENABLE_STATS
+endif
+
 CXXFLAGS += -I$(INC_DIR)
 CXXFLAGS += -O3
 
