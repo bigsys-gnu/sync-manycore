@@ -12,7 +12,6 @@ private:
 
   int find(int key, vector<node_ptr> &predecessors, vector<node_ptr> &successors);
   node_ptr remove_impl(int key);
-  int get_random_level();
 
 public:
   SkipList();

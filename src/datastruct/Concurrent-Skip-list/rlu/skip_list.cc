@@ -8,7 +8,7 @@
 #include <iostream>
 #include <limits>
 #include <cstdio>
-#include <cstdlib>
+#include <random>
 #include <algorithm>
 
 constexpr const auto INT_MINI = numeric_limits<int>::min();
@@ -60,14 +60,17 @@ int SkipList::find(int key, vector<deref_ptr> &predecessors,
    equal to 0.5 Once more than 0.5, returns the level or available max level.
     This decides until which level a new node_t is available.
 */
-int SkipList::get_random_level()
+int get_random_level()
 {
-  size_t l = 0;
-  while(static_cast<float>(rand()) / static_cast<float>(RAND_MAX) <= 0.5)
+  static thread_local std::mt19937 gen(std::random_device{}());
+  std::bernoulli_distribution dis(0.5);
+
+  int level = 0;
+  while (dis(gen))
     {
-      l++;
+      level++;
     }
-  return l >= MAX_LEVEL ? MAX_LEVEL - 1 : l;
+  return std::min(int(MAX_LEVEL - 1), level);
 }
 
 /**

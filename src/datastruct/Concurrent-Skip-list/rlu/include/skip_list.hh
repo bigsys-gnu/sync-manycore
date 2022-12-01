@@ -13,7 +13,6 @@ private:
   node_ptr tail_{nullptr};
 
   int find(int key, vector<deref_ptr> &predecessors, vector<deref_ptr> &successors);
-  int get_random_level();
 
 public:
   SkipList();
