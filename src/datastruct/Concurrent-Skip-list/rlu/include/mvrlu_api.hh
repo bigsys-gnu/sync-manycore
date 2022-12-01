@@ -60,14 +60,14 @@ namespace mvrlu_api
     bool try_lock(void **p_p_obj, size_t size)
     {
       if(!*p_p_obj)
-        return true;
+        return false;
       return ::_mvrlu_try_lock(self_, (void **) p_p_obj, size);
     }
 
     bool try_lock_const(void *obj, size_t size)
     {
       if(!obj)
-        return true;
+        return false;
 
       return ::_mvrlu_try_lock_const(self_, (void *) obj, size);
     }

@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <random>
 #include <algorithm>
+#include <cassert>
 
 constexpr const auto INT_MINI = numeric_limits<int>::min();
 constexpr const auto INT_MAXI = numeric_limits<int>::max();
@@ -83,8 +84,8 @@ bool SkipList::add(int key)
   int top_level = get_random_level();
 
   // Initialization of references of the predecessors and successors
-  vector<deref_ptr> preds(MAX_LEVEL);
-  vector<deref_ptr> succs(MAX_LEVEL);
+  vector<deref_ptr> preds(MAX_LEVEL + 1);
+  vector<deref_ptr> succs(MAX_LEVEL + 1);
 
 restart:
   mvrlu_api::session session; // reader lock and unlock
@@ -124,10 +125,6 @@ restart:
             }
           pre_succ = succs[level];
         }
-      else
-        {
-          succs[level] = pre_succ;
-        }
     }
 
   // All conditions satisfied, create the node_t and insert it
@@ -138,6 +135,8 @@ restart:
     {
       mvrlu_api::assign_pointer(&new_node->next[level], succs[level].get());
       mvrlu_api::assign_pointer(&preds[level]->next[level], new_node);
+      assert(new_node->next[level] != nullptr);
+      assert(preds[level]->next[level] != nullptr);
     }
 
   return true;
@@ -152,8 +151,8 @@ bool SkipList::search(int key)
   // Finds the predecessor and successors
   mvrlu_api::session session;
 
-  vector<deref_ptr> preds(MAX_LEVEL);
-  vector<deref_ptr> succs(MAX_LEVEL);
+  vector<deref_ptr> preds(MAX_LEVEL + 1);
+  vector<deref_ptr> succs(MAX_LEVEL + 1);
 
   int found = find(key, preds, succs);
 
@@ -167,8 +166,8 @@ bool SkipList::search(int key)
 bool SkipList::remove(int key)
 {
   // Initialization of references of the predecessors and successors
-  vector<deref_ptr> preds(MAX_LEVEL);
-  vector<deref_ptr> succs(MAX_LEVEL);
+  vector<deref_ptr> preds(MAX_LEVEL + 1);
+  vector<deref_ptr> succs(MAX_LEVEL + 1);
 
   deref_ptr victim;
   int top_level = -1;
@@ -216,6 +215,7 @@ restart:
   for(int level = top_level; level >= 0; level--)
     {
       mvrlu_api::assign_pointer(&preds[level]->next[level], victim->next[level]);
+      assert(preds[level]->next[level] != nullptr);
     }
 
   victim.free();

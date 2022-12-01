@@ -90,8 +90,8 @@ bool SkipList::add(int key)
   int top_level = get_random_level();
 
   // Initialization of references of the predecessors and successors
-  vector<node_ptr> preds(MAX_LEVEL, nullptr);
-  vector<node_ptr> succs(MAX_LEVEL, nullptr);
+  vector<node_ptr> preds(MAX_LEVEL + 1, nullptr);
+  vector<node_ptr> succs(MAX_LEVEL + 1, nullptr);
 
   // Keep trying to insert the element into the list. In case predecessors and
   // successors are changed, this loop helps to try the insert again
@@ -182,8 +182,8 @@ bool SkipList::search(int key)
 {
 
   // Finds the predecessor and successors
-  vector<node_ptr> preds(MAX_LEVEL, nullptr);
-  vector<node_ptr> succs(MAX_LEVEL, nullptr);
+  vector<node_ptr> preds(MAX_LEVEL + 1, nullptr);
+  vector<node_ptr> succs(MAX_LEVEL + 1, nullptr);
 
   rcu_api::reader_scope reader_session;
 
@@ -215,8 +215,8 @@ bool SkipList::search(int key)
 node_ptr SkipList::remove_impl(int key)
 {
   // Initialization of references of the predecessors and successors
-  vector<node_ptr> preds(MAX_LEVEL, nullptr);
-  vector<node_ptr> succs(MAX_LEVEL, nullptr);
+  vector<node_ptr> preds(MAX_LEVEL + 1, nullptr);
+  vector<node_ptr> succs(MAX_LEVEL + 1, nullptr);
 
   node_ptr victim = nullptr;
   bool is_marked = false;
