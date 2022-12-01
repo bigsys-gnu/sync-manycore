@@ -70,7 +70,7 @@ int get_random_level()
     {
       level++;
     }
-  return std::min(int(MAX_LEVEL - 1), level);
+  return std::min(int(MAX_LEVEL), level);
 }
 
 /**

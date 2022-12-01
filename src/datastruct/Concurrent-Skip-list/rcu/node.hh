@@ -18,7 +18,7 @@ class Node
 
 public:
   // Stores the reference of the next node until the top level for the node
-  array<Node *, L> next {nullptr};
+  array<Node *, L + 1> next {nullptr};
 
 
   // Atomic variable to be marked if this Node is being deleted

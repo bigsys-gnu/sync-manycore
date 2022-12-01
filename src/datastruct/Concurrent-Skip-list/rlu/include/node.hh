@@ -19,7 +19,7 @@ public:
   MVRLU_NEW_DELETE(Node<L>)
 
   // Stores the reference of the next node until the top level for the node
-  array<Node *, L> next {nullptr};
+  array<Node *, L + 1> next {nullptr};
 
   const size_t top_level{L};
 
