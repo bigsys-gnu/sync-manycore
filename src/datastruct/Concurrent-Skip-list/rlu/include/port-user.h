@@ -4,6 +4,7 @@
 #define _PORT_USER_H
 
 #include <sys/mman.h>
+#include <stdlib.h>
 
 #define __init
 #define EXPORT_SYMBOL(sym)
@@ -230,4 +231,16 @@ static inline void port_initiate_nap(pthread_mutex_t *mutex,
 	}
 	port_mutex_unlock(mutex);
 }
+
+static inline void *port_alloc_x(size_t s, unsigned int)
+{
+  return malloc(s);
+}
+
+static inline void port_free(void *ptr)
+{
+  free(ptr);
+}
+
+
 #endif /* _PORT_USER_H */

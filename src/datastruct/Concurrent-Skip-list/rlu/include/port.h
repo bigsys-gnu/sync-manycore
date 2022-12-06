@@ -9,7 +9,8 @@
 #include "port-kernel.h"
 #else
 #include "port-user.h"
-#include "port_cxx.hh"
+/* #include "port_cxx.hh" */
+#define PORT_DEFAULT_ALLOC_FLAG 0
 #endif
 
 static inline void *port_alloc(size_t size)

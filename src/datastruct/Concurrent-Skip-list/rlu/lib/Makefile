@@ -38,15 +38,15 @@ DEPCFLAGS = -MD -MF $(DEPS_DIR)/$*.d -MP
 
 SRC_FILES = $(wildcard *.c)
 OBJS_DIR  = $(CUR_DIR)/.objs$(LIB_SUFFIX)
-OBJ_FILES = $(addprefix $(OBJS_DIR)/, $(SRC_FILES:.c=.o) port_cxx.o)
+OBJ_FILES = $(addprefix $(OBJS_DIR)/, $(SRC_FILES:.c=.o))
 
 all: $(INC_DIR)/numa-config.h libmvrlu$(LIB_SUFFIX).a
 
 $(OBJS_DIR)/%.o: %.c $(DEPS_DIR) $(OBJS_DIR)
 	$(Q)$(CC) $(CFLAGS) $(DEPCFLAGS) -c -o $@ $<
 
-$(OBJS_DIR)/port_cxx.o: port_cxx.cc $(DEPS_DIR) $(OBJS_DIR)
-	$(Q)$(CXX) $(CXXFLAGS) -c -o $@ $<
+# $(OBJS_DIR)/port_cxx.o: port_cxx.cc $(DEPS_DIR) $(OBJS_DIR)
+# 	$(Q)$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 $(OBJS_DIR):
 	$(Q)mkdir -p $(OBJS_DIR)
