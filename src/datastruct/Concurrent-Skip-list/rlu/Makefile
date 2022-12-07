@@ -13,7 +13,7 @@ CFLAGS += -pthread
 
 ifdef DEBUG
 	CFLAGS += -Og -g3
-	CXXFLAGS += -Og -g3
+	CXXFLAGS += -Og -g3 -DDEBUG
 else
 	CFLAGS += -DNDEBUG
 	CFLAGS += -O1 -g

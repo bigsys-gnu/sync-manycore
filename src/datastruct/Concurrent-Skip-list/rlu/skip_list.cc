@@ -5,6 +5,7 @@
 
 #include "skip_list.hh"
 #include "mvrlu_api.hh"
+#include "debug.hh"
 #include <iostream>
 #include <limits>
 #include <cstdio>
@@ -38,6 +39,8 @@ int SkipList::find(int key, vector<deref_ptr> &predecessors,
   for(int level = MAX_LEVEL - 1; level >= 0; level--)
     {
       deref_ptr curr = prev->next[level];
+
+      mvrlu_debug::has_zero_value(prev.get());
 
       while(key > curr->get_key())
         {

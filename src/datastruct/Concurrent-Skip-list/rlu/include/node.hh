@@ -26,7 +26,7 @@ public:
   Node();
   Node(int key, size_t top_level);
   ~Node();
-  int get_key();
+  int get_key() const;
 };
 
 template <size_t L>
@@ -44,7 +44,7 @@ Node<L>::Node(int key, size_t level):
     Returns the key in the node
 */
 template <size_t L>
-int Node<L>::get_key()
+int Node<L>::get_key() const
 {
   return key_;
 }
