@@ -10,7 +10,7 @@
 #define MVRLU_NEW_DELETE(CLASS_NAME)                                    \
   static void*                                                          \
   operator new(unsigned long nbytes, const std::nothrow_t&) noexcept {  \
-    return mvrlu_api::alloc<CLASS_NAME>();                              \
+    return ::mvrlu_alloc(nbytes);                                       \
   }                                                                     \
   static void*                                                          \
   operator new(unsigned long nbytes) {                                  \
@@ -128,7 +128,14 @@ namespace mvrlu_api
 
     derefered_ptr(T* master_node_ptr) // initialize with master node pointer!
     {
-      self_ = reinterpret_cast<T*>(get_handle().mvrlu_deref(master_node_ptr));
+      if (master_node_ptr != nullptr)
+        {
+          self_ = reinterpret_cast<T*>(get_handle().mvrlu_deref(master_node_ptr));
+        }
+      else
+        {
+          self_ = nullptr;
+        }
     }
 
     derefered_ptr(derefered_ptr& ptr)
@@ -144,7 +151,14 @@ namespace mvrlu_api
 
     derefered_ptr& operator = (T* master_node_ptr) // use this carefully
     {
-      self_ = reinterpret_cast<T*>(get_handle().mvrlu_deref(master_node_ptr));
+      if (master_node_ptr != nullptr)
+        {
+          self_ = reinterpret_cast<T*>(get_handle().mvrlu_deref(master_node_ptr));
+        }
+      else
+        {
+          self_ = nullptr;
+        }
       return *this;
     }
 

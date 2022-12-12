@@ -21,10 +21,10 @@ public:
   // Stores the reference of the next node until the top level for the node
   array<Node *, L + 1> next {nullptr};
 
-  const size_t top_level{L};
+  const int top_level{L};
 
   Node();
-  Node(int key, size_t top_level);
+  Node(int key, int top_level);
   ~Node();
   int get_key() const;
 };
@@ -35,7 +35,7 @@ Node<L>::Node()
 }
 
 template <size_t L>
-Node<L>::Node(int key, size_t level):
+Node<L>::Node(int key, int level):
   key_(key), top_level(level)
 {
 }
