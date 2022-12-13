@@ -232,7 +232,7 @@ static inline void port_initiate_nap(pthread_mutex_t *mutex,
 	port_mutex_unlock(mutex);
 }
 
-static inline void *port_alloc_x(size_t s, unsigned int)
+static inline void *port_alloc_x(size_t s, unsigned int f)
 {
   return malloc(s);
 }

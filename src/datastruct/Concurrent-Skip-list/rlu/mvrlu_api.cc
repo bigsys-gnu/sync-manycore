@@ -31,7 +31,7 @@ void thread_handle::operator=(thread_handle &&o)
 std::thread
 mvrlu_api::create_thread(const std::function<void ()> &&worker)
 {
-  return std::thread([&]()
+  return std::thread([worker=std::move(worker)]()
   {
     auto ptr = std::make_unique<thread_handle>();
     handle = ptr.get();

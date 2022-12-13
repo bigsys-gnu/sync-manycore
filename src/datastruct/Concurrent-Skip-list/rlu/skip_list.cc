@@ -36,7 +36,7 @@ int SkipList::find(int key, vector<deref_ptr> &predecessors,
   int found = -1;
   deref_ptr prev = head_;
 
-  for(int level = MAX_LEVEL - 1; level >= 0; level--)
+  for(int level = MAX_LEVEL; level >= 0; level--)
     {
       deref_ptr curr = prev->next[level];
 
