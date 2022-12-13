@@ -17,7 +17,7 @@ ifdef DEBUG
 else
 	CFLAGS += -DNDEBUG
 	CFLAGS += -O1 -g
-	#CXXFLAGS += -O1 -g
+	CXXFLAGS += -O1 -g
 endif
 
 ifdef TRACE
@@ -25,8 +25,16 @@ TRACE_MACRO += TRACE=true
 CXXFLAGS += -DMVRLU_ENABLE_STATS
 endif
 
-CC = gcc
-CXX = g++
+ifdef CLANG
+CC := clang
+CXX := clang++
+CXXFLAGS += -stdlib=libc++
+USE_CLANG += CLANG=true
+else
+CC := gcc
+CXX := g++
+endif
+
 C_OBJ =
 CXX_OBJ = mvrlu_api.o skip_list.o
 BIN = benchmark
@@ -37,11 +45,11 @@ benchmark: benchmark.cc mvrlu $(CXX_OBJ)
 
 
 ${CXX_OBJ}: %.o: %.cc
-	$(CXX) -c $< $(LIBS) $(CXXFLAGS) $(INCLUDES)
+	$(CXX) -c $< $(CXXFLAGS) $(INCLUDES)
 
 
 ${C_OBJ}: %.o: %.c
-	$(CC) -c $< $(LIBS) $(CFLAGS) $(INCLUDES)
+	$(CC) -c $< $(CFLAGS) $(INCLUDES)
 
 
 # C libraries
@@ -54,7 +62,7 @@ rlu-ordo.o: rlu.c
 
 
 mvrlu:
-	$(MAKE) -C ./lib/ ${TRACE_MACRO}
+	$(MAKE) -C ./lib/ ${TRACE_MACRO} ${USE_CLANG}
 
 
 numa-config.h:

@@ -1,6 +1,12 @@
 CUR_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+
+ifdef CLANG
+CC := clang
+CXX := clang++
+else
 CC := gcc
 CXX := g++
+endif
 
 TOOLS_DIR := ../tools
 INC_DIR := ../include
