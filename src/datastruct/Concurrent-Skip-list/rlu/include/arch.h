@@ -133,8 +133,8 @@ static inline uint64_t __attribute__((__always_inline__)) read_tsc(void)
 
 static inline uint64_t __attribute__((__always_inline__)) read_tscp(void)
 {
-	uint32_t a, d;
-	__asm __volatile("rdtscp" : "=a"(a), "=d"(d));
+	uint32_t a, d, c;
+	__asm __volatile("rdtscp" : "=a"(a), "=d"(d), "=c" (c) : : );
 	return ((uint64_t)a) | (((uint64_t)d) << 32);
 }
 
