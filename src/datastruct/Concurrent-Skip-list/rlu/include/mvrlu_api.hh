@@ -59,16 +59,11 @@ namespace mvrlu_api
 
     bool try_lock(void **p_p_obj, size_t size)
     {
-      if(!*p_p_obj)
-        return false;
       return ::_mvrlu_try_lock(self_, (void **) p_p_obj, size);
     }
 
     bool try_lock_const(void *obj, size_t size)
     {
-      if(!obj)
-        return false;
-
       return ::_mvrlu_try_lock_const(self_, (void *) obj, size);
     }
 
@@ -128,14 +123,7 @@ namespace mvrlu_api
 
     derefered_ptr(T* master_node_ptr) // initialize with master node pointer!
     {
-      if (master_node_ptr != nullptr)
-        {
-          self_ = reinterpret_cast<T*>(get_handle().mvrlu_deref(master_node_ptr));
-        }
-      else
-        {
-          self_ = nullptr;
-        }
+      self_ = reinterpret_cast<T*>(get_handle().mvrlu_deref(master_node_ptr));
     }
 
     derefered_ptr(derefered_ptr& ptr)
@@ -151,14 +139,7 @@ namespace mvrlu_api
 
     derefered_ptr& operator = (T* master_node_ptr) // use this carefully
     {
-      if (master_node_ptr != nullptr)
-        {
-          self_ = reinterpret_cast<T*>(get_handle().mvrlu_deref(master_node_ptr));
-        }
-      else
-        {
-          self_ = nullptr;
-        }
+      self_ = reinterpret_cast<T*>(get_handle().mvrlu_deref(master_node_ptr));
       return *this;
     }
 
@@ -206,12 +187,6 @@ namespace mvrlu_api
   };
 
   std::thread create_thread(const std::function<void()>&& worker);
-
-  template <typename T>
-  void *alloc()
-  {
-    return ::mvrlu_alloc(sizeof(T));
-  }
 
   class session
   {

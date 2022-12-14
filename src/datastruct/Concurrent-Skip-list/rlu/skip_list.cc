@@ -1,5 +1,5 @@
 /**
-    Implements the Concurrent Skip list data structure with insert, delete,
+   Implements the Concurrent Skip list data structure with insert, delete,
    search and range operations
 */
 
@@ -60,9 +60,9 @@ int SkipList::find(int key, vector<deref_ptr> &predecessors,
 }
 
 /**
-    Randomly generates a number and increments level if number less than or
+   Randomly generates a number and increments level if number less than or
    equal to 0.5 Once more than 0.5, returns the level or available max level.
-    This decides until which level a new node_t is available.
+   This decides until which level a new node_t is available.
 */
 int get_random_level()
 {
@@ -78,8 +78,8 @@ int get_random_level()
 }
 
 /**
-    Inserts into the Skip list at the appropriate place using locks.
-    Return if already exists.
+   Inserts into the Skip list at the appropriate place using locks.
+   Return if already exists.
 */
 bool SkipList::add(int key)
 {
@@ -90,7 +90,7 @@ bool SkipList::add(int key)
   vector<deref_ptr> preds(MAX_LEVEL + 1);
   vector<deref_ptr> succs(MAX_LEVEL + 1);
 
-restart:
+ restart:
   mvrlu_api::session session; // reader lock and unlock
 
   // Find the predecessors and successors of where the key must be inserted
@@ -119,15 +119,6 @@ restart:
         {
           preds[level] = pre_pred;
         }
-      if (pre_succ != succs[level])
-        {
-          if (!succs[level].try_lock_const())
-            {
-              session.abort();
-              goto restart;
-            }
-          pre_succ = succs[level];
-        }
     }
 
   // All conditions satisfied, create the node_t and insert it
@@ -146,8 +137,8 @@ restart:
 }
 
 /**
-    Performs search to find if a node exists.
-    Return value if the key found, else return empty
+   Performs search to find if a node exists.
+   Return value if the key found, else return empty
 */
 bool SkipList::search(int key)
 {
@@ -163,8 +154,8 @@ bool SkipList::search(int key)
 }
 
 /**
-    Deletes from the Skip list at the appropriate place using locks.
-    Return if key doesn’t exist in the list.
+   Deletes from the Skip list at the appropriate place using locks.
+   Return if key doesn’t exist in the list.
 */
 bool SkipList::remove(int key)
 {
@@ -175,7 +166,7 @@ bool SkipList::remove(int key)
   deref_ptr victim;
   int top_level = -1;
 
-restart:
+ restart:
   mvrlu_api::session session;
 
   // Find the predecessors and successors of where the key to be deleted
@@ -227,7 +218,7 @@ restart:
 }
 
 /**
-    Display the skip list in readable format
+   Display the skip list in readable format
 */
 void SkipList::display()
 {
