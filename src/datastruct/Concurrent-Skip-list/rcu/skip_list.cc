@@ -41,7 +41,7 @@ int SkipList::find(int key, vector<node_ptr> &predecessors, vector<node_ptr> &su
   int found = -1;
   auto prev = head_;
 
-  for(int level = MAX_LEVEL - 1; level >= 0; level--)
+  for(int level = MAX_LEVEL; level >= 0; level--)
     {
       auto curr = prev->next[level];
 
@@ -343,7 +343,7 @@ vector<int> SkipList::range(int start_key, int end_key)
 
   auto curr = head_;
 
-  for(int level = MAX_LEVEL - 1; level >= 0; level--)
+  for(int level = MAX_LEVEL; level >= 0; level--)
     {
       while(curr->next[level] != nullptr && start_key > curr->next[level]->get_key())
         {
