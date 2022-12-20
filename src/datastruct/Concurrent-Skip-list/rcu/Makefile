@@ -1,7 +1,7 @@
 LIBS = -pthread
 TCLAP = -I../tclap/include/		# header only option parser
-CXXFLAGS = -Wall -std=c++17 -O1 -g
-CFLAGS = -Wall -O1 -g
+CXXFLAGS = -Wall -std=c++17 -O2 -g
+CFLAGS = -Wall -O2 -g
 
 ifdef CLANG
 CC = clang

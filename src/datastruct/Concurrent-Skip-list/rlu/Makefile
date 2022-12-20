@@ -1,6 +1,5 @@
 LIBS = -lmvrlu-ordo
 CXXFLAGS = -Wall -std=c++17 -pthread
-CXXFLAGS += -finline-functions
 INCLUDES := -I./include
 TCLAP = -I../tclap/include/		# header only option parser
 LIB_DIR := -L./lib
@@ -16,8 +15,8 @@ ifdef DEBUG
 	CXXFLAGS += -Og -g3 -DDEBUG
 else
 	CFLAGS += -DNDEBUG
-	CFLAGS += -O1 -g
-	CXXFLAGS += -O1 -g
+	CFLAGS += -O2 -g
+	CXXFLAGS += -O2 -g
 endif
 
 ifdef TRACE
