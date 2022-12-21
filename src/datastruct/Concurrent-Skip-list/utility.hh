@@ -73,6 +73,10 @@ struct options
   options(std::string_view welcome_msg, int argc, char *argv[]):
     cmd(welcome_msg.data())
   {
+    cmd.add(thread_num);
+    cmd.add(duration);
+    cmd.add(value_range);
+    cmd.add(rw_ratio);
     cmd.parse(argc, argv);
   }
 
