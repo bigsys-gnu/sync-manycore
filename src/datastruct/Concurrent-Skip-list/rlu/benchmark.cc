@@ -34,12 +34,12 @@ void worker(global_data& gd)
       switch (op)
         {
         case 0:
-          gd.skiplist.add(key);
-          local_stat.add++;
+          if (gd.skiplist.add(key))
+            local_stat.add++;
           break;
         case 1:
-          gd.skiplist.remove(key);
-          local_stat.remove++;
+          if (gd.skiplist.remove(key))
+            local_stat.remove++;
           break;
         case 2:
           gd.skiplist.search(key);
