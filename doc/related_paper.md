@@ -15,3 +15,4 @@
    
 ## slides for skip list
   - Nitro: A Fast, Scalable in-memory storage engine for NoSQL global secondary index [link](https://courses.engr.illinois.edu/cs525/sp2017/Nitro%20Slides.pdf) 
+  - Concurrent Skip Lists [link](https://ocw.snu.ac.kr/sites/default/files/NOTE/MP-14.pdf)
