@@ -9,6 +9,7 @@
   - Parallelizing Skip Lists for In-Memory Multi-Core Database Systems [ICDE'17]
   - S3: a scalable in-memory skip list for key-value store [VLDB'19]
   - JellyFish: A Fast Skip List with MVCC [Middleware '20]
+  - Concurrent Unrolled Skiplist [ICDCS'19]
 
 ## papers for skip list (domestic)
   - An Enhancing technique for scan performance of a skip list with mvcc [link](https://koreascience.kr/article/JAKO202031458604644.pdf)
