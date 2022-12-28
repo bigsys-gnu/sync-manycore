@@ -10,6 +10,7 @@
   - S3: a scalable in-memory skip list for key-value store [VLDB'19]
   - Nitro: A Fast, Scalable In-Memory Storage Engine for NoSQL Global Secondary Index [VLDB'16]
   - JellyFish: A Fast Skip List with MVCC [Middleware '20]
+  - Jiffy: a lock-free skip list with batch updates and snapshots [PPoPP'22]
   - Concurrent Unrolled Skiplist [ICDCS'19]
 
 ## papers for skip list (domestic)
