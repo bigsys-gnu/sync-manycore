@@ -8,6 +8,7 @@
   - PI : a Parallel in-memory skip list based Index [link](https://arxiv.org/pdf/1601.00159.pdf)
   - Parallelizing Skip Lists for In-Memory Multi-Core Database Systems [ICDE'17]
   - S3: a scalable in-memory skip list for key-value store [VLDB'19]
+  - Nitro: A Fast, Scalable In-Memory Storage Engine for NoSQL Global Secondary Index [VLDB'16]
   - JellyFish: A Fast Skip List with MVCC [Middleware '20]
   - Concurrent Unrolled Skiplist [ICDCS'19]
 
