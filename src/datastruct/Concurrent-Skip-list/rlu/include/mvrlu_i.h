@@ -24,6 +24,7 @@
 	S(n_qp_nap)                                                            \
 	S(n_qp_help_reclaim)                                                   \
 	S(n_qp_zombie_reclaim)                                                 \
+    S(n_deref)                                                             \
 	S(max__)
 #define S(x) stat_##x,
 

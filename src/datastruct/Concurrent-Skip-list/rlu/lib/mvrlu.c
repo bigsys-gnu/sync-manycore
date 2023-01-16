@@ -1534,6 +1534,7 @@ void *mvrlu_deref(mvrlu_thread_struct_t *self, void *obj)
 	if (unlikely(!obj))
 		return NULL;
 
+    stat_thread_inc(self, n_deref);
 	p_act = get_act_obj(obj);
 	mvrlu_assert(p_act && vobj_to_obj_hdr(p_act)->type == TYPE_ACTUAL);
 	self->num_act_obj++;
