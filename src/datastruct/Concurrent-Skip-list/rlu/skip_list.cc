@@ -245,10 +245,13 @@ void SkipList::display()
 
 SkipList::~SkipList()
 {
+  std::size_t node_num = 0;
   for (auto iter = head_; iter != nullptr;)
     {
       auto tmp = iter;
       iter = iter->next[0];
       delete tmp;
+      node_num++;
     }
+  std::cout << "The Number Of Nodes: " << node_num << '\n';
 }
