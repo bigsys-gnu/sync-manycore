@@ -3,13 +3,13 @@ TCLAP = -I../tclap/include/		# header only option parser
 CXXFLAGS = -Wall -std=c++17 -O2 -g
 CFLAGS = -Wall -O2 -g
 
-ifdef CLANG
+ifdef GCC
+CC = gcc
+CXX = g++
+else
 CC = clang
 CXX = clang++
 CXXFLAGS += -stdlib=libc++
-else
-CC = gcc
-CXX = g++
 endif
 
 ifdef STAT

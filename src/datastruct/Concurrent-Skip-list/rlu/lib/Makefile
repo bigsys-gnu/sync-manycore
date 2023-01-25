@@ -1,11 +1,11 @@
 CUR_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-ifdef CLANG
-CC := clang
-CXX := clang++
-else
+ifdef GCC
 CC := gcc
 CXX := g++
+else
+CC := clang
+CXX := clang++
 endif
 
 TOOLS_DIR := ../tools

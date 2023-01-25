@@ -24,14 +24,14 @@ TRACE_MACRO += TRACE=true
 CXXFLAGS += -DMVRLU_ENABLE_STATS
 endif
 
-ifdef CLANG
+ifdef GCC
+CC := gcc
+CXX := g++
+else
 CC := clang
 CXX := clang++
 CXXFLAGS += -stdlib=libc++
 USE_CLANG += CLANG=true
-else
-CC := gcc
-CXX := g++
 endif
 
 C_OBJ =
