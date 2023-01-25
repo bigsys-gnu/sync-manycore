@@ -99,7 +99,7 @@ struct options
   }
 };
 
-void gather_stat(global_data& gd, const statistics& local)
+inline void gather_stat(global_data& gd, const statistics& local)
 {
   std::unique_lock<std::mutex> sl(gd.stat_lock);
   auto& global_stat = gd.stat;
