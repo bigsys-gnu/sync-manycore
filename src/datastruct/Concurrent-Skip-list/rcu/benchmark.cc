@@ -10,6 +10,7 @@
 #include "rcu_api.hh"
 #include "skip_list.hh"
 #include "utility.hh"
+#include "statistics.hh"
 
 
 void worker(global_data& gd)
@@ -47,6 +48,7 @@ void worker(global_data& gd)
         }
     }
   gather_stat(gd, local_stat);
+  rcu_stat::gather_stat();
 }
 
 int main(int argc, char *argv[])
@@ -80,6 +82,7 @@ int main(int argc, char *argv[])
   });
 
   gd.stat.print();
+  rcu_stat::print_stat();
 
   return 0;
 }

@@ -11,6 +11,7 @@
 #include <random>
 
 #include "rcu_api.hh"
+#include "statistics.hh"
 
 constexpr const auto INT_MINI = numeric_limits<int>::min();
 constexpr const auto INT_MAXI = numeric_limits<int>::max();
@@ -154,6 +155,7 @@ bool SkipList::add(int key)
       // Conditons are not met, release locks, abort and try again.
       if(!valid)
         {
+          rcu_stat::count_abort();
           continue;
         }
 
@@ -291,6 +293,7 @@ node_ptr SkipList::remove_impl(int key)
           // Conditons are not met, release locks, abort and try again.
           if(!valid)
             {
+              rcu_stat::count_abort();
               continue;
             }
 

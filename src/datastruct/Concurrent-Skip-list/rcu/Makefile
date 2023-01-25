@@ -12,6 +12,10 @@ CC = gcc
 CXX = g++
 endif
 
+ifdef STAT
+CXXFLAGS += -DSTAT
+endif
+
 C_OBJ = new-urcu.o
 CXX_OBJ = rcu_api.o skip_list.o port.o
 TARGET = benchmark
