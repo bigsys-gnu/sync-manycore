@@ -145,12 +145,22 @@ bool SkipList::search(int key)
   // Finds the predecessor and successors
   mvrlu_api::session session;
 
-  vector<deref_ptr> preds(MAX_LEVEL + 1);
-  vector<deref_ptr> succs(MAX_LEVEL + 1);
+  deref_ptr prev = head_;
+  for (int level = MAX_LEVEL; level >= 0; level--)
+    {
+      deref_ptr curr = prev->next[level];
+      while (key > curr->get_key())
+        {
+          prev = curr;
+          curr = prev->next[level];
+        }
 
-  int found = find(key, preds, succs);
-
-  return found != -1;
+      if (key == curr->get_key())
+        {
+          return true;
+        }
+    }
+  return false;
 }
 
 /**
