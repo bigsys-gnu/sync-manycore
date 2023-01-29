@@ -1,0 +1,129 @@
+MV-RLU Skip List benchmark
+Thread Number:	1
+Benchmark Time:	10
+Key Range:	 1 ~ 200000
+Read Ratio:	0
+now let's stop them
+Add:	1227080
+Remove:	1126723
+Search:	0
+The Number Of Nodes: 100359
+MV-RLU Skip List benchmark
+Thread Number:	2
+Benchmark Time:	10
+Key Range:	 1 ~ 200000
+Read Ratio:	0
+now let's stop them
+Add:	2314536
+Remove:	2214308
+Search:	0
+The Number Of Nodes: 100230
+MV-RLU Skip List benchmark
+Thread Number:	4
+Benchmark Time:	10
+Key Range:	 1 ~ 200000
+Read Ratio:	0
+now let's stop them
+Add:	4383485
+Remove:	4283587
+Search:	0
+The Number Of Nodes: 99900
+MV-RLU Skip List benchmark
+Thread Number:	8
+Benchmark Time:	10
+Key Range:	 1 ~ 200000
+Read Ratio:	0
+now let's stop them
+Add:	7729123
+Remove:	7629248
+Search:	0
+The Number Of Nodes: 99877
+MV-RLU Skip List benchmark
+Thread Number:	10
+Benchmark Time:	10
+Key Range:	 1 ~ 200000
+Read Ratio:	0
+now let's stop them
+Add:	9242206
+Remove:	9142145
+Search:	0
+The Number Of Nodes: 100063
+MV-RLU Skip List benchmark
+Thread Number:	20
+Benchmark Time:	10
+Key Range:	 1 ~ 200000
+Read Ratio:	0
+now let's stop them
+Add:	16402948
+Remove:	16302672
+Search:	0
+The Number Of Nodes: 100278
+MV-RLU Skip List benchmark
+Thread Number:	30
+Benchmark Time:	10
+Key Range:	 1 ~ 200000
+Read Ratio:	0
+now let's stop them
+Add:	22559339
+Remove:	22459350
+Search:	0
+The Number Of Nodes: 99991
+MV-RLU Skip List benchmark
+Thread Number:	40
+Benchmark Time:	10
+Key Range:	 1 ~ 200000
+Read Ratio:	0
+now let's stop them
+Add:	26490082
+Remove:	26390221
+Search:	0
+MV-RLU Skip List benchmark
+Thread Number:	50
+Benchmark Time:	10
+Key Range:	 1 ~ 200000
+Read Ratio:	0
+MV-RLU Skip List benchmark
+Thread Number:	60
+Benchmark Time:	10
+Key Range:	 1 ~ 200000
+Read Ratio:	0
+MV-RLU Skip List benchmark
+Thread Number:	70
+Benchmark Time:	10
+Key Range:	 1 ~ 200000
+Read Ratio:	0
+now let's stop them
+Add:	27471883
+Remove:	27371316
+Search:	0
+The Number Of Nodes: 100569
+MV-RLU Skip List benchmark
+Thread Number:	80
+Benchmark Time:	10
+Key Range:	 1 ~ 200000
+Read Ratio:	0
+now let's stop them
+Add:	25816098
+Remove:	25716204
+Search:	0
+The Number Of Nodes: 99896
+MV-RLU Skip List benchmark
+Thread Number:	90
+Benchmark Time:	10
+Key Range:	 1 ~ 200000
+Read Ratio:	0
+now let's stop them
+Add:	24434852
+Remove:	24335135
+Search:	0
+The Number Of Nodes: 99719
+MV-RLU Skip List benchmark
+Thread Number:	100
+Benchmark Time:	10
+Key Range:	 1 ~ 200000
+Read Ratio:	0
+now let's stop them
+Add:	22751589
+Remove:	22651944
+Search:	0
+The Number Of Nodes: 99647

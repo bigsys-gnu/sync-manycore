@@ -54,6 +54,6 @@ Node<L>::~Node()
 {
 }
 
-constexpr const size_t MAX_LEVEL = 255;
+constexpr const size_t MAX_LEVEL = 17;
 using node_t = Node<MAX_LEVEL>;
 using node_ptr = node_t *;
