@@ -1,5 +1,5 @@
 LIBS = -lmvrlu-ordo
-CXXFLAGS = -Wall -std=c++17 -pthread
+CXXFLAGS = -Wall -Wextra -std=c++17 -pthread
 INCLUDES := -I./include
 TCLAP = -I../tclap/include/		# header only option parser
 LIB_DIR := -L./lib
