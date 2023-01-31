@@ -15,8 +15,8 @@ ifdef DEBUG
 	CXXFLAGS += -Og -g3 -DDEBUG
 else
 	CFLAGS += -DNDEBUG
-	CFLAGS += -O2 -g
-	CXXFLAGS += -O2 -g
+	CFLAGS += -O3 -g
+	CXXFLAGS += -O3 -g
 endif
 
 ifdef TRACE
