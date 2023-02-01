@@ -108,6 +108,9 @@ namespace rcu_stat
     std::cout << "RCU STATISTICS\n"
               << global_stat.abort_counter << '\n';
   }
+
+  template <>
+  inline void print_stat<false>() {}
 }
 
 #endif /* STATISTICS_H */

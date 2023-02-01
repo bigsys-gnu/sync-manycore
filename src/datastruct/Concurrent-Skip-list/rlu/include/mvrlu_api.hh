@@ -212,17 +212,32 @@ namespace mvrlu_api
 
   class system
   {
+    bool init_{false};
   public:
     system()
     {
-      ::mvrlu_init();
+      if (!init_)
+        {
+          ::mvrlu_init();
+          init_ = true;
+        }
     }
 
     ~system()
     {
-      ::mvrlu_finish();
+      if (init_)
+        {
+          ::mvrlu_finish();
+          init_ = false;
+        }
     }
   };
+
+  inline void print_stats()
+  {
+    ::mvrlu_print_stats();
+  }
+
 } // namespace mvrlu
 
 #endif /* MVRLU_API_H */

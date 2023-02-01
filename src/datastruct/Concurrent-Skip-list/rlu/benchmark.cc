@@ -11,11 +11,6 @@
 #include "mvrlu_api.hh"
 #include "utility.hh"
 
-#ifdef MVRLU_ENABLE_STATS
-#include "mvrlu.h"
-#endif
-
-
 void worker(global_data& gd)
 {
   std::default_random_engine engine{std::random_device{}()};
@@ -60,10 +55,6 @@ int main(int argc, char *argv[])
   ops.init_global_data(gd);
   ops.print_bench_stat();
 
-  #ifdef MVRLU_ENABLE_STATS
-  {
-  #endif
-
   mvrlu_api::system mvrlu_system;
   std::vector<std::thread> workers;
 
@@ -87,11 +78,8 @@ int main(int argc, char *argv[])
     }
 
   gd.stat.print();
-
-  #ifdef MVRLU_ENABLE_STATS
-  } // end benchmark
-  mvrlu_print_stats();
-  #endif
+  mvrlu_system.~system();
+  mvrlu_api::print_stats();
 
   return 0;
 }
