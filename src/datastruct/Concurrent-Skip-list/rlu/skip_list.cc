@@ -103,21 +103,20 @@ bool SkipList::add(int key)
 
   // create copy every preds and succs
   deref_ptr pre_pred;
-  deref_ptr pre_succ;
-  for (int level = 0; level <= top_level; level++)
+  for (int level = top_level; level >= 0; level--)
     {
       if (pre_pred != preds[level])
         {
+          pre_pred = preds[level];
           if (!preds[level].try_lock())
             {
               session.abort();
               goto restart;
             }
-          pre_pred = preds[level];
         }
       else
         {
-          preds[level] = pre_pred;
+          preds[level] = preds[level + 1];
         }
     }
 
@@ -203,16 +202,16 @@ bool SkipList::remove(int key)
     {
       if (pre_pred != preds[level])
         {
+          pre_pred = preds[level];
           if (!preds[level].try_lock())
             {
               session.abort();
               goto restart;
             }
-          pre_pred = preds[level];
         }
       else
         {
-          preds[level] = pre_pred;
+          preds[level] = preds[level + 1];
         }
     }
 
