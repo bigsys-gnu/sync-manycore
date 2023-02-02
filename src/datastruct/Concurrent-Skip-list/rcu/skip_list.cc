@@ -182,32 +182,28 @@ bool SkipList::add(int key)
 */
 bool SkipList::search(int key)
 {
-
-  // Finds the predecessor and successors
-  vector<node_ptr> preds(MAX_LEVEL + 1, nullptr);
-  vector<node_ptr> succs(MAX_LEVEL + 1, nullptr);
-
   rcu_api::reader_scope reader_session;
 
-  int found = find(key, preds, succs);
-
-  // If not found return empty.
-  if(found == -1)
+  node_ptr prev = head_;
+  node_ptr found = nullptr;
+  for(int level = MAX_LEVEL; level >= 0; level--)
     {
-      return false;
-    }
+      auto curr = prev->next[level];
+      while(key > curr->get_key())
+        {
+          prev = curr;
+          curr = prev->next[level];
+        }
 
-  auto curr = succs[found];
+      if(key == curr->get_key())
+        {
+          found = curr;
+          break;
+        }
+    }
 
   // If found, unmarked and fully linked, then return value. Else return empty.
-  if(curr->fully_linked && !curr->marked)
-    {
-      return true;
-    }
-  else
-    {
-      return false;
-    }
+  return (found != nullptr) && found->fully_linked && !found->marked;
 }
 
 /**
