@@ -105,12 +105,6 @@ namespace mvrlu_api
     ::_mvrlu_assign_pointer((void **) p_ptr, (void *) obj);
   }
 
-  template <typename T>
-  bool cmp_ptrs(T *obj, T *obj2)
-  {
-    return ::mvrlu_cmp_ptrs((void *) obj, (void *) obj2);
-  }
-
   // use this derefered_ptr only in single session
   template <typename T>
   class derefered_ptr
@@ -145,7 +139,7 @@ namespace mvrlu_api
 
     bool operator == (const derefered_ptr& o) const
     {
-      return ::mvrlu_cmp_ptrs(self_, o.self_);
+      return self_ == o.self_;
     }
 
     bool operator != (const derefered_ptr& o) const
