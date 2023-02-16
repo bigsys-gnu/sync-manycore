@@ -55,10 +55,10 @@ private:
       return next_key_;
     }
 
-    void set_next(const slot& o)
+    void set_next(const slot& o, int next_key)
     {
       mvrlu_api::assign_pointer(&next_, o.next_);
-      next_key_ = o.next_key_;
+      next_key_ = next_key;
     }
   };
 
@@ -121,7 +121,7 @@ int Node<L>::get_next_key(int level) const
 template <size_t L>
 void Node<L>::set_next(Node *next, int level)
 {
-  next_[level].set_next(slot{next, level});
+  next_[level].set_next(slot{next, level}, next->get_key());
 }
 
 
