@@ -45,9 +45,14 @@ private:
       next_key_ = key;
     }
 
-    mvrlu_api::derefered_ptr<Node> get_next() const
+    mvrlu_api::derefered_ptr<Node> deref_next() const
     {
       return mvrlu_api::derefered_ptr<Node>(next_);
+    }
+
+    Node * get_next() const
+    {
+      return next_;
     }
 
     int get_next_key() const
@@ -75,7 +80,8 @@ public:
   int get_level() const;
   int get_next_key(int level) const;
   void set_next(Node *next, int level);
-  mvrlu_api::derefered_ptr<Node> get_next(int level) const;
+  mvrlu_api::derefered_ptr<Node> deref_next(int level) const;
+  Node * get_next(int level) const;
 };
 
 template <size_t L>
@@ -126,7 +132,13 @@ void Node<L>::set_next(Node *next, int level)
 
 
 template <size_t L>
-mvrlu_api::derefered_ptr<Node<L>> Node<L>::get_next(int level) const
+mvrlu_api::derefered_ptr<Node<L>> Node<L>::deref_next(int level) const
+{
+  return next_[level].deref_next();
+}
+
+template <size_t L>
+Node<L> * Node<L>::get_next(int level) const
 {
   return next_[level].get_next();
 }
