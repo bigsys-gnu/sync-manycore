@@ -3,8 +3,6 @@
 #include <map>
 #include "node.hh"
 
-using deref_ptr = mvrlu_api::derefered_ptr<node_t>;
-
 class SkipList
 {
 private:
@@ -12,7 +10,8 @@ private:
   node_ptr head_{nullptr};
   node_ptr tail_{nullptr};
 
-  int find(int key, vector<deref_ptr> &predecessors, vector<deref_ptr> &successors);
+  int find(int key, std::vector<deref_ptr> &predecessors,
+           std::vector<deref_ptr> &successors);
 
 public:
   SkipList();
@@ -22,5 +21,4 @@ public:
   bool add(int key);
   bool search(int key);
   bool remove(int key);
-  void display();
 };
