@@ -60,7 +60,7 @@ private:
       return next_key_;
     }
 
-    void set_next(const slot& o, int next_key)
+    void set_next(const slot&& o, int next_key)
     {
       mvrlu_api::assign_pointer(&next_, o.next_);
       next_key_ = next_key;
