@@ -33,27 +33,32 @@ int SkipList::find(int key, std::vector<deref_ptr> &predecessors,
                    std::vector<deref_ptr> &successors)
 {
   int found = -1;
+
   deref_ptr prev = head_;
-
-  for(int level = MAX_LEVEL; level >= 0; level--)
+  deref_ptr curr;
+  int upper_next_key{head_->get_key()};
+  for (int level = MAX_LEVEL; level >= 0; level--)
     {
-      auto curr = prev->get_next(level);
-
-      mvrlu_debug::has_zero_value(prev.get());
-
-      while(key > curr->get_key())
+      if (upper_next_key != prev->get_next_key(level))
         {
-          prev = curr;
+          // different next node 
           curr = prev->get_next(level);
         }
-
-      if(found == -1 && key == curr->get_key())
+      if (key >= prev->get_next_key(level)) // need to forward
         {
-          found = level;
+          while (key > curr->get_key())
+            {
+              prev = curr;
+              curr = curr->get_next(level);
+            }
+          if (found == -1 && key == curr->get_key())
+            {
+              found = level;
+            }
         }
-
       predecessors[level] = prev;
       successors[level] = curr;
+      upper_next_key = prev->get_next_key(level);
     }
   return found;
 }
