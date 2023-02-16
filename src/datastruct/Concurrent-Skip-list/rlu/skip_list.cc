@@ -42,23 +42,23 @@ int SkipList::find(int key, std::vector<deref_ptr> &predecessors,
       if (upper_next_key != prev->get_next_key(level))
         {
           // different next node 
-          curr = prev->get_next(level);
-        }
-      if (key >= prev->get_next_key(level)) // need to forward
-        {
-          while (key > curr->get_key())
+          curr = prev->deref_next(level);
+          if (key >= prev->get_next_key(level)) // need to forward
             {
-              prev = curr;
-              curr = curr->get_next(level);
-            }
-          if (found == -1 && key == curr->get_key())
-            {
-              found = level;
+              do
+                {
+                  prev = curr;
+                  curr = curr->deref_next(level);
+                } while(key > prev->get_next_key(level));
             }
         }
       predecessors[level] = prev;
       successors[level] = curr;
       upper_next_key = prev->get_next_key(level);
+    }
+  if (key == curr->get_key())
+    {
+      found = 0;
     }
   return found;
 }

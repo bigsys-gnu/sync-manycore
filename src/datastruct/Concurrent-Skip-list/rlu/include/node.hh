@@ -9,7 +9,7 @@
 
 template <size_t L> class Node;
 
-constexpr const size_t MAX_LEVEL = 17;
+constexpr const size_t MAX_LEVEL = 20;
 using node_t = Node<MAX_LEVEL>;
 using node_ptr = node_t *;
 using deref_ptr = mvrlu_api::derefered_ptr<node_t>;
@@ -60,7 +60,7 @@ private:
       return next_key_;
     }
 
-    void set_next(const slot& o, int next_key)
+    void set_next(const slot&& o, int next_key)
     {
       mvrlu_api::assign_pointer(&next_, o.next_);
       next_key_ = next_key;
