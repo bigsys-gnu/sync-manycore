@@ -149,11 +149,11 @@ bool SkipList::search(int key)
   deref_ptr prev = head_;
   for (int level = MAX_LEVEL; level >= 0; level--)
     {
-      auto curr = prev->get_next(level);
+      auto curr = prev->deref_next(level);
       while (key > curr->get_key())
         {
           prev = curr;
-          curr = prev->get_next(level);
+          curr = prev->deref_next(level);
         }
 
       if (key == curr->get_key())
@@ -219,7 +219,7 @@ bool SkipList::remove(int key)
 
   for(int level = top_level; level >= 0; level--)
     {
-      preds[level]->set_next(victim->get_next(level).get(), level);
+      preds[level]->set_next(victim->get_next(level), level);
     }
 
   victim.free();
