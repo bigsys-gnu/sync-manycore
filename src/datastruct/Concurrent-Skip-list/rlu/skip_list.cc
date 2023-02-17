@@ -22,45 +22,30 @@ SkipList::SkipList()
 
   for (int i = 0; i <= MAX_LEVEL; i++)
     {
-      head_->set_next(tail_, i);
+      head_->set_next(tail_, INT_MAXI, i);
+      tail_->set_next(nullptr, INT_MAXI, i);
     }
 }
 
 /*
  * Must call this function within MV-RLU Session
  */
-int SkipList::find(int key, std::vector<deref_ptr> &predecessors,
-                   std::vector<deref_ptr> &successors)
+deref_ptr SkipList::find(int key, std::vector<deref_ptr> &predecessors)
 {
-  int found = -1;
-
-  deref_ptr prev = head_;
+  deref_ptr target;
+  deref_ptr pred = head_;
   deref_ptr curr;
-  int upper_next_key{head_->get_key()};
+  // int upper_next_key{-1};       // benchmark uses only positive integer key
   for (int level = MAX_LEVEL; level >= 0; level--)
     {
-      if (upper_next_key != prev->get_next_key(level))
+      while (key > pred->get_next_key(level))
         {
-          // different next node 
-          curr = prev->deref_next(level);
-          if (key >= prev->get_next_key(level)) // need to forward
-            {
-              do
-                {
-                  prev = curr;
-                  curr = curr->deref_next(level);
-                } while(key > prev->get_next_key(level));
-            }
+          pred = pred->deref_next(level);
+          curr = pred->deref_next(level);
         }
-      predecessors[level] = prev;
-      successors[level] = curr;
-      upper_next_key = prev->get_next_key(level);
+      predecessors[level] = pred;
     }
-  if (key == curr->get_key())
-    {
-      found = 0;
-    }
-  return found;
+  return curr;
 }
 
 /**
@@ -92,17 +77,16 @@ bool SkipList::add(int key)
 
   // Initialization of references of the predecessors and successors
   std::vector<deref_ptr> preds(MAX_LEVEL + 1);
-  std::vector<deref_ptr> succs(MAX_LEVEL + 1);
 
  restart:
   mvrlu_api::session session; // reader lock and unlock
 
   // Find the predecessors and successors of where the key must be inserted
-  int found = find(key, preds, succs);
+  auto found = find(key, preds);
 
-  if(found != -1)
+  if (found != nullptr && found->get_key() == key)  // already exist
     {
-      return false;  // already exist
+      return false;
     }
 
   // create copy every preds and succs
@@ -130,8 +114,9 @@ bool SkipList::add(int key)
   // Insert
   for(int level = 0; level <= top_level; level++)
     {
-      new_node->set_next(succs[level].get(), level);
-      preds[level]->set_next(new_node, level);
+      new_node->set_next(preds[level]->get_next(level),
+                         preds[level]->get_next_key(level), level);
+      preds[level]->set_next(new_node, new_node->get_key(), level);
     }
 
   return true;
@@ -172,25 +157,21 @@ bool SkipList::remove(int key)
 {
   // Initialization of references of the predecessors and successors
   std::vector<deref_ptr> preds(MAX_LEVEL + 1);
-  std::vector<deref_ptr> succs(MAX_LEVEL + 1);
-
-  deref_ptr victim;
   int top_level = -1;
 
  restart:
   mvrlu_api::session session;
 
   // Find the predecessors and successors of where the key to be deleted
-  int found = find(key, preds, succs);
+  auto victim = find(key, preds);
+
+  if (victim == nullptr || victim->get_key() != key) // no key found
+    {
+      return false;
+    }
 
   // If found, select the node to delete. else return
-  if(found != -1)
-    {
-      victim = succs[found];
-      top_level = victim->get_level();
-    }
-  else
-    return false;
+  top_level = victim->get_level();
 
   // create copy for every preds and victim
   if (!victim.try_lock_const())
@@ -219,7 +200,8 @@ bool SkipList::remove(int key)
 
   for(int level = top_level; level >= 0; level--)
     {
-      preds[level]->set_next(victim->get_next(level), level);
+      preds[level]->set_next(victim->get_next(level),
+                             victim->get_next_key(level), level);
     }
 
   victim.free();
