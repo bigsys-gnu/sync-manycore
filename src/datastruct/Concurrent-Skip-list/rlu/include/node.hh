@@ -79,7 +79,7 @@ public:
   int get_key() const;
   int get_level() const;
   int get_next_key(int level) const;
-  void set_next(Node *next, int level);
+  void set_next(Node *next, int next_key, int level);
   mvrlu_api::derefered_ptr<Node> deref_next(int level) const;
   Node * get_next(int level) const;
 };
@@ -125,9 +125,9 @@ int Node<L>::get_next_key(int level) const
 }
 
 template <size_t L>
-void Node<L>::set_next(Node *next, int level)
+void Node<L>::set_next(Node *next, int next_key, int level)
 {
-  next_[level].set_next(slot{next, level}, next->get_key());
+  next_[level].set_next(slot{next, level}, next_key);
 }
 
 

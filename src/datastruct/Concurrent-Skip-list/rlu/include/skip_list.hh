@@ -10,8 +10,7 @@ private:
   node_ptr head_{nullptr};
   node_ptr tail_{nullptr};
 
-  int find(int key, std::vector<deref_ptr> &predecessors,
-           std::vector<deref_ptr> &successors);
+  deref_ptr find(int key, std::vector<deref_ptr> &predecessors);
 
 public:
   SkipList();
