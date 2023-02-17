@@ -34,18 +34,16 @@ deref_ptr SkipList::find(int key, std::vector<deref_ptr> &predecessors)
 {
   deref_ptr target;
   deref_ptr pred = head_;
-  deref_ptr curr;
   // int upper_next_key{-1};       // benchmark uses only positive integer key
   for (int level = MAX_LEVEL; level >= 0; level--)
     {
       while (key > pred->get_next_key(level))
         {
           pred = pred->deref_next(level);
-          curr = pred->deref_next(level);
         }
       predecessors[level] = pred;
     }
-  return curr;
+  return pred->deref_next(0);
 }
 
 /**
