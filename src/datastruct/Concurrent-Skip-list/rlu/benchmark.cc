@@ -10,12 +10,13 @@
 #include "skip_list.hh"
 #include "mvrlu_api.hh"
 #include "utility.hh"
+#include "zipf.hh"
 
-void worker(global_data& gd)
+template <typename RandomDist>
+void worker(global_data& gd, RandomDist key_dist)
 {
   std::mt19937 engine{std::random_device{}()};
   std::discrete_distribution<unsigned int> dist = gd.operation_dist;
-  std::uniform_int_distribution<int> key_dist(1, gd.key_max);
   std::unique_lock<std::mutex> lk(gd.cond_lock); // hold lock
   gd.condvar.wait(lk);
   lk.unlock();
@@ -62,7 +63,18 @@ int main(int argc, char *argv[])
     {
       workers.emplace_back(mvrlu_api::create_thread([&gd]()
       {
-        worker(gd);
+        switch (gd.dist_type) {
+        case workload_dist::UNIFORM:
+          worker(gd, std::uniform_int_distribution<int>(1, gd.key_max));
+          break;
+        case workload_dist::ZIPF:
+          worker(gd, custom_random::zipf_generator());
+          break;
+        case workload_dist::NORMAL:
+          break;
+        default:
+          break;
+        }
       }));
     }
 
