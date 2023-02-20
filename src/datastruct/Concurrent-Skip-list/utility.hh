@@ -9,8 +9,10 @@
 #include <condition_variable>
 #include <cassert>
 #include <string_view>
+#include <string>
+#include <vector>
+#include <tclap/CmdLine.h>
 #include "skip_list.hh"
-#include "tclap/CmdLine.h"
 
 enum class benchmark_type
   {
@@ -70,6 +72,11 @@ struct options
   TCLAP::ValueArg<float> rw_ratio{"o", "rw_ratio", "skiplist read operation ratio",
                                   false, 0.8f, "float"};
 
+  TCLAP::ValuesConstraint<std::string> workload_types{std::vector<std::string>{"uniform", "zipf", "normal"}};
+  TCLAP::ValueArg<std::string> workload_dist{"w", "workload_dist",
+                                             "workload random distribution", false,
+                                             "uniform", &workload_types};
+
   options(std::string_view welcome_msg, int argc, char *argv[]):
     cmd(welcome_msg.data())
   {
@@ -77,6 +84,7 @@ struct options
     cmd.add(duration);
     cmd.add(value_range);
     cmd.add(rw_ratio);
+    cmd.add(workload_dist);
     cmd.parse(argc, argv);
   }
 
