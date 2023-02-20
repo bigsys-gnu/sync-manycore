@@ -15,7 +15,7 @@
 
 void worker(global_data& gd)
 {
-  std::default_random_engine engine{std::random_device{}()};
+  std::mt19937 engine{std::random_device{}()};
   std::discrete_distribution<unsigned int> dist = gd.operation_dist;
   std::uniform_int_distribution<int> key_dist(1, gd.key_max);
   rcu_api::regist();
