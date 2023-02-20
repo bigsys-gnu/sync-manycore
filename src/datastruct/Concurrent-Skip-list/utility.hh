@@ -13,11 +13,19 @@
 #include <vector>
 #include <tclap/CmdLine.h>
 #include "skip_list.hh"
+#include "zipf.hh"
 
 enum class benchmark_type
   {
     RCU,
     MV_RLU,
+  };
+
+enum class workload_dist
+  {
+    UNIFORM,
+    ZIPF,
+    NORMAL,
   };
 
 struct statistics
@@ -44,6 +52,7 @@ struct global_data
   bool stop = false;
   SkipList skiplist;
   statistics stat;
+  workload_dist dist_type = workload_dist::UNIFORM;
 
   // default is add : remove : read = 1 : 1 : 1
   std::discrete_distribution<unsigned int> operation_dist{1, 1, 1};
@@ -94,16 +103,30 @@ struct options
     gd.key_max = value_range.getValue();
     gd.thread_num = thread_num.getValue();
     gd.set_operation_ratio(rw_ratio.getValue());
+    if (workload_dist.getValue() == "uniform")
+      {
+        gd.dist_type = workload_dist::UNIFORM;
+      }
+    else if (workload_dist.getValue() == "zipf")
+      {
+        gd.dist_type = workload_dist::ZIPF;
+        custom_random::zipf_generator::init_constants(0.9, value_range.getValue());
+      }
+    else
+      {
+        gd.dist_type = workload_dist::NORMAL;
+      }
   }
 
   void
   print_bench_stat()
   {
-    std::cout << cmd.getMessage() << std::endl
-              << "Thread Number:\t" << thread_num.getValue() << std::endl
-              << "Benchmark Time:\t" << duration.getValue() << std::endl
-              << "Key Range:\t 1 ~ " << value_range.getValue() << std::endl
-              << "Read Ratio:\t" << rw_ratio.getValue() << std::endl;
+    std::cout << cmd.getMessage() << '\n'
+              << "Thread Number:\t" << thread_num.getValue() << '\n'
+              << "Benchmark Time:\t" << duration.getValue() << '\n'
+              << "Key Range:\t 1 ~ " << value_range.getValue() << '\n'
+              << "Read Ratio:\t" << rw_ratio.getValue() << '\n'
+              << "Random Distribution:\t" << workload_dist.getValue() << '\n';
   }
 };
 
