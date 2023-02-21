@@ -5,7 +5,7 @@ make -C ./rcu/ -j
 
 for i in 1 2 4 8 10 20 30 40 50 60 70 80 90 100
 do
-    ./rcu/benchmark -r 200000 -o 0 -d 10 -t $i | tee -a file.txt
+    ./rcu/benchmark -r 200000 -o 0 -d 10 -t $i -w zipf | tee -a file.txt
     echo "======================= " Done $i "=========================="
 done
 
@@ -19,11 +19,11 @@ make -C ./rlu/ -j
 
 for i in 1 2 4 8 10 20 30 40 50 60 70 80 90 100
 do
-    result=$(./rlu/benchmark -r 200000 -o 0 -d 10 -t $i)
+    result=$(./rlu/benchmark -r 200000 -o 0 -d 10 -t $i -w zipf)
 
     while [ $? -ne 0 ]; do
         echo "Retry Benchmark cause of segfault"
-        result=$(./rlu/benchmark -r 200000 -o 0 -d 10 -t $i)
+        result=$(./rlu/benchmark -r 200000 -o 0 -d 10 -t $i -w zipf)
     done
     echo "$result" | tee -a file.txt
     echo "======================= " Done $i "=========================="
