@@ -6,6 +6,8 @@ make -C ./rcu/ -j
 for i in 1 2 4 8 10 20 30 40 50 60 70 80 90 100
 do
     ./rcu/benchmark -r 200000 -o 0 -d 10 -t $i -w zipf | tee -a file.txt
+    sleep 1
+    sync; echo 1 > /proc/sys/vm/drop_caches
     echo "======================= " Done $i "=========================="
 done
 
@@ -20,10 +22,14 @@ make -C ./rlu/ -j
 for i in 1 2 4 8 10 20 30 40 50 60 70 80 90 100
 do
     result=$(./rlu/benchmark -r 200000 -o 0 -d 10 -t $i -w zipf)
+    sleep 1
+    sync; echo 1 > /proc/sys/vm/drop_caches
 
     while [ $? -ne 0 ]; do
         echo "Retry Benchmark cause of segfault"
         result=$(./rlu/benchmark -r 200000 -o 0 -d 10 -t $i -w zipf)
+        sleep 1
+        sync; echo 1 > /proc/sys/vm/drop_caches
     done
     echo "$result" | tee -a file.txt
     echo "======================= " Done $i "=========================="
