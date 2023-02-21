@@ -82,7 +82,7 @@ bool SkipList::add(int key)
   // Find the predecessors and successors of where the key must be inserted
   auto found = find(key, preds);
 
-  if (found != nullptr && found->get_key() == key)  // already exist
+  if (found == nullptr || found->get_key() == key)  // already exist
     {
       return false;
     }
