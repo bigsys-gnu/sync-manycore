@@ -1,90 +1,110 @@
-//=  C Version Authors...                                                   =
-//=-------------------------------------------------------------------------=
-//=  Author: Kenneth J. Christensen                                         =
-//=          University of South Florida                                    =
-//=          WWW: http://www.csee.usf.edu/~christen                         =
-//=          Email: christen@csee.usf.edu                                   =
-//=-------------------------------------------------------------------------=
-//=  History: KJC (11/16/03) - Genesis (from genexp.c)                      =
-//===========================================================================
-//=  C++ Version Author...                                                  =
-//=  Author: Chang-Hui Kim                                                  =
-//=          Gyeongsang National University                                 =
-//=          Email: kch9001@gmail.com                                       =
+/** Zipf-like random distribution.
+ *
+ * "Rejection-inversion to generate variates from monotone discrete
+ * distributions", Wolfgang Hörmann and Gerhard Derflinger
+ * ACM TOMACS 6.3 (1996): 169-184
+ * https://stackoverflow.com/questions/9983239/how-to-generate-zipf-distributed-numbers-efficiently
+ * Stackoverflow User: users/1582476/drobilla
+ */
 #pragma once
 #ifndef ZIPF_H
 #define ZIPF_H
+#include <algorithm>
 #include <cmath>
 #include <random>
-#include <cassert>
-#include <iostream>
+#include <fstream>
 
 namespace custom_random
 {
-  class zipf_generator
+  template<class IntType = unsigned long, class RealType = double, class RandomEngine = std::mt19937>
+  class zipf_distribution
   {
-    inline static double c_;
-    inline static double alpha_;
-    inline static int max_value_;
-    std::uniform_real_distribution<double> dist_{0, 1};
-
   public:
-    zipf_generator() = default;
+    typedef RealType input_type;
+    typedef IntType result_type;
 
-    static void init_constants(double alpha, std::size_t max)
+    static_assert(std::numeric_limits<IntType>::is_integer, "");
+    static_assert(!std::numeric_limits<RealType>::is_integer, "");
+
+    zipf_distribution(const IntType n=std::numeric_limits<IntType>::max(),
+                      const RealType q=1.0)
+      : n(n)
+      , q(q)
+      , H_x1(H(1.5) - 1.0)
+      , H_n(H(n + 0.5))
+      , dist(H_x1, H_n)
+    {}
+
+    IntType operator()(RandomEngine& rng)
     {
-      alpha_ = alpha;
-      max_value_ = max;
-      for (std::size_t i = 1; i <= max; i++)
-        {
-          c_ += (1.0 / std::pow(double(i), alpha));
+      while (true) {
+        const RealType u = dist(rng);
+        const RealType x = H_inv(u);
+        const IntType  k = clamp<IntType>(std::round(x), 1, n);
+        if (u >= H(k + 0.5) - h(k)) {
+          return k;
         }
-      c_ = 1.0 / c_;
+      }
     }
 
-    static double get_C()
+  private:
+    /** Clamp x to [min, max]. */
+    template<typename T>
+    static constexpr T clamp(const T x, const T min, const T max)
     {
-      return zipf_generator::c_;
+      return std::max(min, std::min(max, x));
     }
 
-    static double get_alpha()
+    /** exp(x) - 1 / x */
+    static double
+    expxm1bx(const double x)
     {
-      return zipf_generator::alpha_;
+      return (std::abs(x) > epsilon)
+        ? std::expm1(x) / x
+        : (1.0 + x/2.0 * (1.0 + x/3.0 * (1.0 + x/4.0)));
     }
 
-    static std::size_t get_max()
+    /** H(x) = log(x) if q == 1, (x^(1-q) - 1)/(1 - q) otherwise.
+     * H(x) is an integral of h(x).
+     *
+     * Note the numerator is one less than in the paper order to work with all
+     * positive q.
+     */
+    const RealType H(const RealType x)
     {
-      return zipf_generator::max_value_;
+      const RealType log_x = std::log(x);
+      return expxm1bx((1.0 - q) * log_x) * log_x;
     }
 
-    template <typename RandomEngine>
-    int operator () (RandomEngine& rng) // generate zipf random value
+    /** log(1 + x) / x */
+    static RealType
+    log1pxbx(const RealType x)
     {
-      double z = 0;
-      do
-        {
-          z = dist_(rng);
-        }
-      while(z == 0 || z == 1);
-
-      double sum_prob = 0;
-      std::size_t zipf_value = 1;
-      for (std::size_t i = 1; i <= get_max(); i++)
-        {
-          sum_prob = sum_prob + get_C() / std::pow(double(i), get_alpha());
-          if (sum_prob >= z)
-            {
-              zipf_value = i;
-              break;
-            }
-        }
-
-      assert(zipf_value >= 1 && zipf_value <= get_max());
-      return zipf_value;
+      return (std::abs(x) > epsilon)
+        ? std::log1p(x) / x
+        : 1.0 - x * ((1/2.0) - x * ((1/3.0) - x * (1/4.0)));
     }
 
+    /** The inverse function of H(x) */
+    const RealType H_inv(const RealType x)
+    {
+      const RealType t = std::max(-1.0, x * (1.0 - q));
+      return std::exp(log1pxbx(t) * x);
+    }
+
+    /** That hat function h(x) = 1 / (x ^ q) */
+    const RealType h(const RealType x)
+    {
+      return std::exp(-q * std::log(x));
+    }
+
+    static constexpr RealType epsilon = 1e-8;
+
+    IntType                                  n;     ///< Number of elements
+    RealType                                 q;     ///< Exponent
+    RealType                                 H_x1;  ///< H(x_1)
+    RealType                                 H_n;   ///< H(n)
+    std::uniform_real_distribution<RealType> dist;  ///< [H(x_1), H(n)]
   };
-
 }    
-
 #endif /* ZIPF_H */

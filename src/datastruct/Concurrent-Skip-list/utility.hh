@@ -110,7 +110,6 @@ struct options
     else if (workload_dist.getValue() == "zipf")
       {
         gd.dist_type = workload_dist::ZIPF;
-        custom_random::zipf_generator::init_constants(0.9, value_range.getValue());
       }
     else
       {
