@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
           worker(gd, std::uniform_int_distribution<int>(1, gd.key_max));
           break;
         case workload_dist::ZIPF:
-          worker(gd, custom_random::zipf_distribution<int, double>(gd.key_max, 0.9));
+          worker(gd, custom_random::zipf_distribution<int, double>(gd.key_max));
           break;
         case workload_dist::NORMAL:
           break;
