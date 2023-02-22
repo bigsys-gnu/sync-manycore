@@ -82,7 +82,7 @@ bool SkipList::add(int key)
   // Find the predecessors and successors of where the key must be inserted
   auto found = find(key, preds);
 
-  if (found == nullptr || found->get_key() == key)  // already exist
+  if (found != nullptr && found->get_key() == key)  // already exist
     {
       return false;
     }
@@ -206,13 +206,13 @@ bool SkipList::remove(int key)
 
 SkipList::~SkipList()
 {
-  // std::size_t node_num = 0;
-  // for (auto iter = head_; iter != nullptr;)
-  //   {
-  //     auto tmp = iter;
-  //     iter = iter->next[0];
-  //     delete tmp;
-  //     node_num++;
-  //   }
-  // std::cout << "The Number Of Nodes: " << node_num << '\n';
+  std::size_t node_num = 0;
+  for (auto iter = head_; iter != nullptr;)
+    {
+      auto tmp = iter;
+      iter = iter->get_next(0);
+      delete tmp;
+      node_num++;
+    }
+  std::cout << "The Number Of Nodes: " << node_num << '\n';
 }

@@ -206,7 +206,7 @@ namespace mvrlu_api
 
   class system
   {
-    bool init_{false};
+    inline static bool init_{false};
   public:
     system()
     {
