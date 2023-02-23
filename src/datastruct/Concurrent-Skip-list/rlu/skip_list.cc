@@ -34,7 +34,6 @@ deref_ptr SkipList::find(int key, std::vector<deref_ptr> &predecessors)
 {
   deref_ptr target;
   deref_ptr pred = head_;
-  // int upper_next_key{-1};       // benchmark uses only positive integer key
   for (int level = MAX_LEVEL; level >= 0; level--)
     {
       while (key > pred->get_next_key(level))
@@ -88,8 +87,14 @@ bool SkipList::add(int key)
     }
 
   // create copy every preds and succs
-  deref_ptr pre_pred;
-  for (int level = top_level; level >= 0; level--)
+  deref_ptr pre_pred = preds[top_level];
+  if (!preds[top_level].try_lock())
+    {
+      session.abort();
+      goto restart;
+    }
+
+  for (int level = top_level - 1; level >= 0; level--)
     {
       if (pre_pred != preds[level])
         {
@@ -175,8 +180,14 @@ bool SkipList::remove(int key)
       goto restart;
     }
 
-  deref_ptr pre_pred;
-  for (int level = top_level; level >= 0; level--)
+  deref_ptr pre_pred = preds[top_level];
+  if (!preds[top_level].try_lock())
+    {
+      session.abort();
+      goto restart;
+    }
+
+  for (int level = top_level - 1; level >= 0; level--)
     {
       if (pre_pred != preds[level])
         {
