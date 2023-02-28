@@ -585,6 +585,10 @@ static mvrlu_cpy_hdr_struct_t *log_alloc(mvrlu_log_t *log,
 		chs->obj_hdr.type = TYPE_BOGUS;
 
 		log->tail_cnt += bogus_size;
+        mvrlu_assert_msg(log->tail_cnt - log->head_cnt <= MVRLU_LOG_SIZE,
+                         log_to_thread(log) ,
+                         "\nLog size: %lu\n",
+                         log->tail_cnt - log->head_cnt);
 		mvrlu_assert(log_index(log->tail_cnt) == 0);
 		*bogus = 1;
 	}
@@ -631,6 +635,10 @@ static mvrlu_cpy_hdr_struct_t *log_append_begin(mvrlu_log_t *log,
 		ws->thread = log_to_thread(log);
 		log->cur_wrt_set = ws;
 		log->tail_cnt += get_log_size(chs);
+        mvrlu_assert_msg(log->tail_cnt - log->head_cnt <= MVRLU_LOG_SIZE,
+                         log_to_thread(log) ,
+                         "\nLog size: %lu\n",
+                         log->tail_cnt - log->head_cnt);
 		mvrlu_assert(*bogus == 0);
 	}
 
@@ -653,6 +661,10 @@ static inline void log_append_end(mvrlu_log_t *log, mvrlu_cpy_hdr_struct_t *chs,
 				  int bogus_allocated)
 {
 	log->tail_cnt += get_log_size(chs);
+    mvrlu_assert_msg(log->tail_cnt - log->head_cnt <= MVRLU_LOG_SIZE,
+                     log_to_thread(log) ,
+                     "\nLog size: %lu\n",
+                     log->tail_cnt - log->head_cnt);
 	log->cur_wrt_set->num_objs++;
 	if (bogus_allocated) {
 		log->cur_wrt_set->num_objs++;
