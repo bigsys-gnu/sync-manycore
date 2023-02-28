@@ -6,7 +6,7 @@
 #include "arch.h"
 /* #include "mvrlu_i.h" */
 
-//#define MVRLU_ENABLE_ASSERT
+#define MVRLU_ENABLE_ASSERT
 //#define MVRLU_ENABLE_FREE_POISIONING
 /* #define MVRLU_ENABLE_STATS */
 //#define MVRLU_TIME_MEASUREMENT
@@ -46,8 +46,8 @@
 		##__VA_ARGS__);
 
 #define mvrlu_trace(self, fmt, ...)                                            \
-	fprintf(stderr, "\n[%d][%d][%ld]:%s:%d:%s(): " fmt, self->thread_id,   \
-		self->run_counter, self->local_version, __FILE__, __LINE__,    \
+	fprintf(stderr, "\n[%d][%d][%ld]:%s:%d:%s(): " fmt, self->tid,   \
+		self->run_cnt, self->local_clk, __FILE__, __LINE__,    \
 		__func__, ##__VA_ARGS__);
 
 #ifdef MVRLU_ENABLE_ASSERT
@@ -60,13 +60,13 @@
 		mvrlu_assert_fail();                                           \
 	}
 
-#define mvrlu_assert_msg(cond, self, fmt, ...)                                 \
+#define mvrlu_assert_msg(cond, self, fmt, ...)                           \
 	if (unlikely(!(cond))) {                                               \
 		extern void mvrlu_assert_fail(void);                           \
 		printf("\n-----------------------------------------------\n"); \
 		printf("\nAssertion failure: %s:%d '%s'\n", __FILE__,          \
-		       __LINE__, #cond);                                       \
-		MVRLU_TRACE(self, fmt, ##__VA_ARGS__);                         \
+               __LINE__, #cond);                                       \
+        mvrlu_trace(self, fmt, ##__VA_ARGS__);                         \
 		mvrlu_assert_fail();                                           \
 	}
 #else
