@@ -6,7 +6,7 @@
 #include "arch.h"
 /* #include "mvrlu_i.h" */
 
-#define MVRLU_ENABLE_ASSERT
+//#define MVRLU_ENABLE_ASSERT
 //#define MVRLU_ENABLE_FREE_POISIONING
 /* #define MVRLU_ENABLE_STATS */
 //#define MVRLU_TIME_MEASUREMENT

@@ -3,3 +3,7 @@ bench
 
 # c objects
 *.o
+
+# clangd
+compile_commands.json
+.cache
