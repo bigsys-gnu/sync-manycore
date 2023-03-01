@@ -9,7 +9,7 @@
 
 template <size_t L> class Node;
 
-constexpr const size_t MAX_LEVEL = 20;
+constexpr const int MAX_LEVEL = 20;
 using node_t = Node<MAX_LEVEL>;
 using node_ptr = node_t *;
 using deref_ptr = mvrlu_api::derefered_ptr<node_t>;
