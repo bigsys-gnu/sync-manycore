@@ -81,7 +81,7 @@ bool SkipList::add(int key)
   // Find the predecessors and successors of where the key must be inserted
   auto found = find(key, preds);
 
-  if (found != nullptr && found->get_key() == key)  // already exist
+  if (found.get() != nullptr && found->get_key() == key)  // already exist
     {
       return false;
     }
@@ -157,7 +157,6 @@ bool SkipList::remove(int key)
 {
   // Initialization of references of the predecessors and successors
   std::vector<deref_ptr> preds(MAX_LEVEL + 1);
-  int top_level = -1;
 
  restart:
   mvrlu_api::session session;
@@ -165,13 +164,13 @@ bool SkipList::remove(int key)
   // Find the predecessors and successors of where the key to be deleted
   auto victim = find(key, preds);
 
-  if (victim == nullptr || victim->get_key() != key) // no key found
+  if (victim.get() == nullptr || victim->get_key() != key) // no key found
     {
       return false;
     }
 
   // If found, select the node to delete. else return
-  top_level = victim->get_level();
+  int top_level = victim->get_level();
 
   // create copy for every preds and victim
   if (!victim.try_lock_const())
