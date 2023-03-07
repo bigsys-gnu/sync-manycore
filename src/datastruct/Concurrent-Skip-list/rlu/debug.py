@@ -4,6 +4,10 @@ import json
 import re
 
 
+def gdb_print(msg):
+    gdb.write(f"{msg}\n", gdb.STDOUT)
+
+
 def isinlog(obj_ptr):
     start_addr = gdb.lookup_static_symbol("g_start_addr").value()
     end_addr = gdb.lookup_static_symbol("g_end_addr").value()
@@ -29,9 +33,11 @@ class MVHDR(gdb.Function):
     def invoke(self, node_ptr):
         mvrlu_hdr = None
         if isinlog(node_ptr):
+            gdb_print("COPY HDR")
             mvrlu_hdr_ptr = int(node_ptr) - self.cpy_hdr_type.sizeof
             mvrlu_hdr = gdb.Value(mvrlu_hdr_ptr).cast(self.cpy_hdr_type.pointer())
         else:
+            gdb_print("ACT HDR")
             mvrlu_hdr_ptr = int(node_ptr) - self.act_hdr_type.sizeof
             mvrlu_hdr = gdb.Value(mvrlu_hdr_ptr).cast(self.act_hdr_type.pointer())
         return mvrlu_hdr.dereference()
@@ -44,20 +50,21 @@ class NodePrinter(object):
         self.val = val
 
     def to_string(self):
-        return self.val["key_"]
+        msg = f'node height: {self.val["top_level_"]}\n'
+        msg += f'key: {self.val["key_"]}\n'
+        return msg
 
     def display_hint(self):
         return None
 
-
-def lookup_function(val):
-    lookup_tag = val.type.tag
-    if lookup_tag is None:
-        return None
-    regex = re.compile("^Node<.*>$")
-    if regex.match(lookup_tag):
-        return NodePrinter(val)
-    return None
+    def children(self):
+        # _Nm is size
+        # _M_elems is static array
+        slots = self.val["next_"]
+        items = slots["__elems_"].cast(slots.type.template_argument(0).pointer())
+        for i in range(int(self.val["top_level_"])):
+            yield f"\n{i}", items.dereference()
+            items += 1
 
 
 def build_pretty_printer():
