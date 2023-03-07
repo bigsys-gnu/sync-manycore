@@ -40,14 +40,13 @@ class MVHDR(gdb.Function):
             gdb_print("ACT HDR")
             mvrlu_hdr_ptr = int(node_ptr) - self.act_hdr_type.sizeof
             mvrlu_hdr = gdb.Value(mvrlu_hdr_ptr).cast(self.act_hdr_type.pointer())
-        return mvrlu_hdr.dereference()
+        return mvrlu_hdr
 
 
 class NodePrinter(object):
     "print node_t"
-    def __init__(self, val):
-        "docstring"
-        self.val = val
+    def __init__(self, node):
+        self.val = node
 
     def to_string(self):
         msg = f'node height: {self.val["top_level_"]}\n'
@@ -62,14 +61,59 @@ class NodePrinter(object):
         # _M_elems is static array
         slots = self.val["next_"]
         items = slots["__elems_"].cast(slots.type.template_argument(0).pointer())
-        for i in range(int(self.val["top_level_"])):
+        for i in range(int(self.val["top_level_"] + 1)):
             yield f"\n{i}", items.dereference()
             items += 1
 
 
+def pretty_obj_hdr(obj_hdr):
+    return json.dumps({
+        "obj_size" : f"{obj_hdr['obj_size']}",
+        "padding_size" : f"{obj_hdr['padding_size']}",
+        "type" : f"{obj_hdr['type']}",
+        "p_copy" : f"{int(obj_hdr['p_copy']):#x}",
+    }, indent=2)
+
+
+class CopyHdrPrinter(object):
+    "Print MV-RLU Copy Header Struct"
+    def __init__(self, hdr):
+        self.cpy_hdr = hdr["cpy_hdr"]
+        self.obj_hdr = hdr["obj_hdr"]
+
+    def to_string(self):
+        msg = "Copy Header\n"
+        structure = {
+            "p_wrt_clk" : f"{int(self.cpy_hdr['p_wrt_clk']):#x}",
+            "wrt_clk_next" : f"{self.cpy_hdr['wrt_clk_next']}",
+            "__wrt_clk" : f"{self.cpy_hdr['__wrt_clk']}",
+            "p_act" : f"{self.cpy_hdr['p_act']}",
+        }
+        msg += f"cpy_hdr = {json.dumps(structure, indent=2)}\n"
+        msg += f"obj_hdr = {pretty_obj_hdr(self.obj_hdr)}"
+        return msg
+
+
+class ActHdrPrinter(object):
+    "Print MV-RLU Actual Header Struct"
+    def __init__(self, hdr):
+        self.act_hdr = hdr["act_hdr"]
+        self.obj_hdr = hdr["obj_hdr"]
+
+    def to_string(self):
+        msg = "Actual Header\n"
+        structure = {
+            "p_lock" : f"{int(self.act_hdr['p_lock']):#x}",
+        }
+        msg += f"act_hdr = {json.dumps(structure, indent=2)}\n"
+        msg += f"obj_hdr = {pretty_obj_hdr(self.obj_hdr)}"
+        return msg
+
 def build_pretty_printer():
     pp = gdb.printing.RegexpCollectionPrettyPrinter("mvrlu")
     pp.add_printer("Node", "^Node<.*>$", NodePrinter)
+    pp.add_printer("Copy Hdr", "^mvrlu_cpy_hdr_struct$", CopyHdrPrinter)
+    pp.add_printer("Act Hdr", "^mvrlu_act_hdr_struct$", ActHdrPrinter)
     return pp
 
 
