@@ -72,6 +72,7 @@ def pretty_obj_hdr(obj_hdr):
         "padding_size" : f"{obj_hdr['padding_size']}",
         "type" : f"{obj_hdr['type']}",
         "p_copy" : f"{int(obj_hdr['p_copy']):#x}",
+        "obj[0]" : f"{int(obj_hdr['obj'].address):#x}",
     }, indent=2)
 
 
