@@ -23,10 +23,10 @@ class CheckObjIsInLog(gdb.Function):
         return isinlog(obj_ptr)
 
 
-class MVHDR(gdb.Function):
+class NodeToMVRLU(gdb.Function):
     "Return MVRLU struct"
     def __init__(self):
-        super(MVHDR, self).__init__("get_mvrlu")
+        super(NodeToMVRLU, self).__init__("node_to_mvrlu")
         self.cpy_hdr_type = gdb.lookup_type("struct mvrlu_cpy_hdr_struct")
         self.act_hdr_type = gdb.lookup_type("struct mvrlu_act_hdr_struct")
 
@@ -39,6 +39,24 @@ class MVHDR(gdb.Function):
         else:
             gdb_print("ACT HDR")
             mvrlu_hdr_ptr = int(node_ptr) - self.act_hdr_type.sizeof
+            mvrlu_hdr = gdb.Value(mvrlu_hdr_ptr).cast(self.act_hdr_type.pointer())
+        return mvrlu_hdr
+
+
+class CastMVRLU(gdb.Function):
+    "cast pointer to mvrlu hdr"
+    def __init__(self):
+        super(CastMVRLU, self).__init__("cast_mvrlu")
+        self.cpy_hdr_type = gdb.lookup_type("struct mvrlu_cpy_hdr_struct")
+        self.act_hdr_type = gdb.lookup_type("struct mvrlu_act_hdr_struct")
+
+    def invoke(self, mvrlu_hdr_ptr):
+        mvrlu_hdr = None
+        if isinlog(mvrlu_hdr_ptr):
+            gdb_print("COPY HDR")
+            mvrlu_hdr = gdb.Value(mvrlu_hdr_ptr).cast(self.cpy_hdr_type.pointer())
+        else:
+            gdb_print("ACT HDR")
             mvrlu_hdr = gdb.Value(mvrlu_hdr_ptr).cast(self.act_hdr_type.pointer())
         return mvrlu_hdr
 
@@ -120,7 +138,8 @@ def build_pretty_printer():
 
 if __name__ == '__main__':
     CheckObjIsInLog()
-    MVHDR()
+    NodeToMVRLU()
+    CastMVRLU()
 
     gdb.printing.register_pretty_printer(
         gdb.current_objfile(),
