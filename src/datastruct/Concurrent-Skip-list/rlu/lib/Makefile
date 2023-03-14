@@ -64,7 +64,7 @@ $(INC_DIR)/numa-config.h:
 	$(Q)$(TOOLS_DIR)/cpu-topology.py > $@
 
 libmvrlu$(LIB_SUFFIX).a: $(OBJ_FILES)
-	# $(Q)/bin/rm -f $@
+	$(Q)/bin/rm -f $@
 	$(Q)$(AR) crU $@ $^
 
 clean:

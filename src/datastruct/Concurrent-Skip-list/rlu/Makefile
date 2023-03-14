@@ -1,8 +1,14 @@
-LIBS = -lmvrlu-ordo
+ifdef GCLK
+MVRLU = mvrlu-gclk
+else
+MVRLU = mvrlu-ordo
+endif
+
 CXXFLAGS = -Wall -Wextra -std=c++17 -pthread
 INCLUDES := -I./include
 TCLAP = -I../tclap/include/		# header only option parser
 LIB_DIR := -L./lib
+LIBS = -l${MVRLU}
 
 CFLSGS = -Wall
 CFLAGS += -D_REENTRANT
@@ -39,7 +45,7 @@ CXX_OBJ = mvrlu_api.o skip_list.o
 BIN = benchmark
 
 
-benchmark: benchmark.cc mvrlu $(CXX_OBJ)
+benchmark: benchmark.cc $(MVRLU) $(CXX_OBJ)
 	$(CXX) -o $@ $< $(CXX_OBJ) $(LIBS) $(CXXFLAGS) $(INCLUDES) $(LIB_DIR) $(TCLAP)
 
 
@@ -60,8 +66,12 @@ rlu-ordo.o: rlu.c
 	$(CC) $(CFLAGS) $(DEFINES) $(INCLUDES) -DRLU_ORDO_TIMESTAMPING -c -o $@ $<
 
 
-mvrlu:
+mvrlu-ordo:
 	$(MAKE) -C ./lib/ ${TRACE_MACRO} ${USE_CLANG}
+
+
+mvrlu-gclk:
+	$(MAKE) -C ./lib/ ${TRACE_MACRO} ${USE_CLANG} CONF=gclk
 
 
 numa-config.h:

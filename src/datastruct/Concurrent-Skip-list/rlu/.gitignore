@@ -1,5 +1,6 @@
 *.a
 .deps-ordo
+.deps-gclk
 cscope.*
 .clangd
 main
