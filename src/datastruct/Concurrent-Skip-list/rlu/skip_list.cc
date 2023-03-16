@@ -32,7 +32,6 @@ SkipList::SkipList()
  */
 deref_ptr SkipList::find(int key, std::vector<deref_ptr> &predecessors)
 {
-  deref_ptr target;
   deref_ptr pred = head_;
   for (int level = MAX_LEVEL; level >= 0; level--)
     {
@@ -42,7 +41,7 @@ deref_ptr SkipList::find(int key, std::vector<deref_ptr> &predecessors)
         }
       predecessors[level] = pred;
     }
-  return pred->deref_next(0);
+  return predecessors[0]->deref_next(0);
 }
 
 /**

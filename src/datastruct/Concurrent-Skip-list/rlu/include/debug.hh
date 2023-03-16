@@ -23,7 +23,7 @@ namespace mvrlu_debug
   {
     if constexpr (enable_debug)
       {
-        if (condition(args...))
+        if (!condition(args...))
           {
             std::cerr << msg << std::endl;
             std::terminate();
@@ -36,7 +36,7 @@ namespace mvrlu_debug
   {
     if constexpr (enable_debug)
       {
-        if (condition(arg))
+        if (!condition(arg))
           {
             std::cerr << msg << std::endl;
             std::terminate();
@@ -47,12 +47,30 @@ namespace mvrlu_debug
   // assume that node has no zero value
   inline bool check_zero_value(const node_ptr ptr)
   {
-    return ptr->get_key() == 0;
+    return ptr->get_key() != 0;
   }
   inline auto has_zero_value = [](const node_ptr ptr)
   {
     assert("Node has zero value!!!"sv, check_zero_value, ptr);
   };
+
+  inline bool level_limit(const node_ptr ptr)
+  {
+    return ptr->get_level() <= MAX_LEVEL;
+  }
+  inline auto check_level_limit = [](const node_ptr ptr)
+  {
+    assert("Node exceeded its level limit"sv, level_limit, ptr);
+  };
+
+  inline bool ascending_check(const node_ptr ptr)
+  {
+    return ptr->get_key() < ptr->get_next_key(0);
+  }
+  inline auto check_key_ordering(const node_ptr ptr)
+  {
+    assert("ascending check failed"sv, ascending_check, ptr);
+  }
 
 }
 
