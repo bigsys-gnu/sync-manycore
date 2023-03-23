@@ -77,7 +77,7 @@ class NodePrinter(object):
     def children(self):
         # _Nm is size
         # _M_elems is static array
-        slots = self.val["next_"]
+        slots = self.val["next"]
         items = slots["__elems_"].cast(slots.type.template_argument(0).pointer())
         for i in range(int(self.val["top_level_"] + 1)):
             yield f"\n{i}", items.dereference()

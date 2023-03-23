@@ -63,14 +63,14 @@ namespace mvrlu_debug
     assert("Node exceeded its level limit"sv, level_limit, ptr);
   };
 
-  inline bool ascending_check(const node_ptr ptr)
-  {
-    return ptr->get_key() < ptr->get_next_key(0);
-  }
-  inline auto check_key_ordering(const node_ptr ptr)
-  {
-    assert("ascending check failed"sv, ascending_check, ptr);
-  }
+  // inline bool ascending_check(const node_ptr ptr)
+  // {
+  //   return ptr->get_key() < ptr->get_next_key(0);
+  // }
+  // inline auto check_key_ordering(const node_ptr ptr)
+  // {
+  //   assert("ascending check failed"sv, ascending_check, ptr);
+  // }
 
 }
 

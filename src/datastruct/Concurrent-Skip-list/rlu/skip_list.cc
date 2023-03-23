@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <random>
 #include <cassert>
+#include <algorithm>
 
 constexpr const auto INT_MINI = std::numeric_limits<int>::min();
 constexpr const auto INT_MAXI = std::numeric_limits<int>::max();
@@ -20,10 +21,9 @@ SkipList::SkipList()
   head_ = new node_t(INT_MINI, MAX_LEVEL);
   tail_ = new node_t(INT_MAXI, MAX_LEVEL);
 
-  for (int i = 0; i <= MAX_LEVEL; i++)
+  for (auto& n : head_->next)
     {
-      head_->set_next(tail_, INT_MAXI, i);
-      tail_->set_next(nullptr, INT_MAXI, i);
+      n = tail_;
     }
 }
 
@@ -32,16 +32,23 @@ SkipList::SkipList()
  */
 deref_ptr SkipList::find(int key, std::vector<deref_ptr> &predecessors)
 {
+  deref_ptr target;
   deref_ptr pred = head_;
   for (int level = MAX_LEVEL; level >= 0; level--)
     {
-      while (key > pred->get_next_key(level))
+      deref_ptr curr = pred->next[level];
+      while (key > curr->get_key())
         {
-          pred = pred->deref_next(level);
+          pred = curr;
+          curr = deref_ptr(curr->next[level]);
+        }
+      if (curr->get_key() == key)
+        {
+          target = curr;
         }
       predecessors[level] = pred;
     }
-  return predecessors[0]->deref_next(0);
+  return target;
 }
 
 /**
@@ -116,9 +123,8 @@ bool SkipList::add(int key)
   // Insert
   for(int level = 0; level <= top_level; level++)
     {
-      new_node->set_next(preds[level]->get_next(level),
-                         preds[level]->get_next_key(level), level);
-      preds[level]->set_next(new_node, new_node->get_key(), level);
+      mvrlu_api::assign_pointer(&new_node->next[level], preds[level]->next[level]);
+      mvrlu_api::assign_pointer(&preds[level]->next[level], new_node);
     }
 
   return true;
@@ -133,14 +139,16 @@ bool SkipList::search(int key)
   // Finds the predecessor and successors
   mvrlu_api::session session;
 
-  deref_ptr curr = head_;
+  deref_ptr pred = head_;
+  deref_ptr target = pred->next[MAX_LEVEL];
   for (int level = MAX_LEVEL; level >= 0; level--)
     {
-      while (key >= curr->get_next_key(level))
+      while (key > target->get_key())
         {
-          curr = curr->deref_next(level);
+          pred = target;
+          target = deref_ptr(target->next[level]);
         }
-      if (key == curr->get_key())
+      if (target->get_key() == key)
         {
           return true;
         }
@@ -204,8 +212,7 @@ bool SkipList::remove(int key)
 
   for(int level = top_level; level >= 0; level--)
     {
-      preds[level]->set_next(victim->get_next(level),
-                             victim->get_next_key(level), level);
+      mvrlu_api::assign_pointer(&preds[level]->next[level], victim->next[level]);
     }
 
   victim.free();
@@ -219,7 +226,7 @@ SkipList::~SkipList()
   for (auto iter = head_; iter != nullptr;)
     {
       auto tmp = iter;
-      iter = iter->get_next(0);
+      iter = iter->next[0];
       delete tmp;
       node_num++;
     }
