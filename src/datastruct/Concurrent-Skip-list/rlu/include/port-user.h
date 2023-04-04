@@ -5,6 +5,7 @@
 
 #include <sys/mman.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #define __init
 #define EXPORT_SYMBOL(sym)
@@ -34,8 +35,8 @@ typedef struct log_region_allocator {
 } log_region_allocator_t;
 
 static log_region_allocator_t g_lr;
-static void *g_start_addr __read_mostly;
-static void *g_end_addr __read_mostly;
+static uint8_t *g_start_addr __read_mostly;
+static uint8_t *g_end_addr __read_mostly;
 
 static inline int port_log_region_init(unsigned long size, unsigned long num)
 {
@@ -105,7 +106,7 @@ static inline void port_free_log_mem(void *addr)
 	madvise(addr, g_lr.size, MADV_DONTNEED);
 
 	/* Calculate a position in the bitmap */
-	pos = (addr - g_start_addr) / g_lr.size;
+	pos = ((uint8_t *)addr - g_start_addr) / g_lr.size;
 	i = pos / 64;
 	j = pos - (i + 64);
 	mask = 0x1ul << j;
@@ -119,7 +120,7 @@ static inline void port_free_log_mem(void *addr)
 
 static inline int port_addr_in_log_region(void *addr)
 {
-	return addr >= g_start_addr && addr < g_end_addr;
+  return (uint8_t *)addr >= g_start_addr && (uint8_t *)addr < g_end_addr;
 }
 
 /*
