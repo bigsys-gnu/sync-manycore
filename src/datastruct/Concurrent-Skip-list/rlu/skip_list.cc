@@ -3,8 +3,6 @@
    search and range operations
 */
 
-#include "skip_list.hh"
-#include "mvrlu_api.hh"
 #include "debug.hh"
 #include <iostream>
 #include <limits>
@@ -12,6 +10,9 @@
 #include <random>
 #include <cassert>
 #include <algorithm>
+#include <map>
+#include "skip_list.hh"
+#include "mvrlu_api.hh"
 
 constexpr const auto INT_MINI = std::numeric_limits<int>::min();
 constexpr const auto INT_MAXI = std::numeric_limits<int>::max();
@@ -34,6 +35,7 @@ deref_ptr SkipList::find(int key, std::vector<deref_ptr> &predecessors)
 {
   deref_ptr target;
   deref_ptr pred = head_;
+  predecessors.resize(MAX_LEVEL + 1);
   for (int level = MAX_LEVEL; level >= 0; level--)
     {
       deref_ptr curr = pred->next[level];
@@ -42,13 +44,37 @@ deref_ptr SkipList::find(int key, std::vector<deref_ptr> &predecessors)
           pred = curr;
           curr = deref_ptr(curr->next[level]);
         }
-      if (curr->get_key() == key)
-        {
-          target = curr;
-        }
+      target = curr;
       predecessors[level] = pred;
     }
   return target;
+}
+
+bool lock_preds(std::vector<deref_ptr> &preds)
+{
+  std::map<int, deref_ptr> set;
+
+  for (auto ptr : preds)
+    {
+      set[ptr->get_key()] = ptr;
+    }
+
+
+  for (auto iter = set.rbegin(); iter != set.rend(); iter++)
+    {
+      std::unique_lock<std::mutex> guard{*iter->second->lock_ptr, std::defer_lock};
+      if (!guard.try_lock() || !iter->second.try_lock())
+        {
+          return false;
+        }
+    }
+
+  for (auto &ptr : preds)
+    {
+      ptr = set[ptr->get_key()];
+    }
+
+  return true;
 }
 
 /**
@@ -80,8 +106,14 @@ bool SkipList::add(int key)
 
   // Initialization of references of the predecessors and successors
   std::vector<deref_ptr> preds(MAX_LEVEL + 1);
+  int count = 0;
 
  restart:
+  if (count++ > 1000)
+    {
+      mvrlu_api::get_handle().mvrlu_flush_log();
+      count = 0;
+    }
   mvrlu_api::session session; // reader lock and unlock
 
   // Find the predecessors and successors of where the key must be inserted
@@ -93,35 +125,18 @@ bool SkipList::add(int key)
     }
 
   // create copy every preds and succs
-  deref_ptr pre_pred = preds[top_level];
-  if (!preds[top_level].try_lock())
+  preds.resize(top_level + 1);
+  if (!lock_preds(preds))
     {
       session.abort();
       goto restart;
-    }
-
-  for (int level = top_level - 1; level >= 0; level--)
-    {
-      if (pre_pred != preds[level])
-        {
-          pre_pred = preds[level];
-          if (!preds[level].try_lock())
-            {
-              session.abort();
-              goto restart;
-            }
-        }
-      else
-        {
-          preds[level] = preds[level + 1];
-        }
     }
 
   // All conditions satisfied, create the node_t and insert it
   node_ptr new_node = new node_t(key, top_level);
 
   // Insert
-  for(int level = 0; level <= top_level; level++)
+  for(size_t level = 0; level < preds.size(); level++)
     {
       mvrlu_api::assign_pointer(&new_node->next[level], preds[level]->next[level]);
       mvrlu_api::assign_pointer(&preds[level]->next[level], new_node);
@@ -165,9 +180,15 @@ bool SkipList::remove(int key)
   // Initialization of references of the predecessors and successors
   std::vector<deref_ptr> preds(MAX_LEVEL + 1);
 
- restart:
-  mvrlu_api::session session;
+  int count = 0;
 
+ restart:
+  if (count++ > 1000)
+    {
+      mvrlu_api::get_handle().mvrlu_flush_log();
+      count = 0;
+    }
+  mvrlu_api::session session; // reader lock and unlock
   // Find the predecessors and successors of where the key to be deleted
   auto victim = find(key, preds);
 
@@ -186,31 +207,15 @@ bool SkipList::remove(int key)
       goto restart;
     }
 
-  deref_ptr pre_pred = preds[top_level];
-  if (!preds[top_level].try_lock())
+  // create copy every preds and succs
+  preds.resize(top_level + 1);
+  if (!lock_preds(preds))
     {
       session.abort();
       goto restart;
     }
 
-  for (int level = top_level - 1; level >= 0; level--)
-    {
-      if (pre_pred != preds[level])
-        {
-          pre_pred = preds[level];
-          if (!preds[level].try_lock())
-            {
-              session.abort();
-              goto restart;
-            }
-        }
-      else
-        {
-          preds[level] = preds[level + 1];
-        }
-    }
-
-  for(int level = top_level; level >= 0; level--)
+  for (size_t level = 0; level < preds.size(); level++)
     {
       mvrlu_api::assign_pointer(&preds[level]->next[level], victim->next[level]);
     }

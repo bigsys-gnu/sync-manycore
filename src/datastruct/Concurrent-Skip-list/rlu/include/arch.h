@@ -54,7 +54,7 @@ extern "C" {
 #define ____page_aligned __attribute__((aligned(PAGE_SIZE)))
 
 #ifndef __packed
-#define __packed
+#define __packed __attribute__((packed))
 #endif
 
 #ifndef static_assert

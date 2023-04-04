@@ -2,14 +2,14 @@
 
 #include <vector>
 #include <mutex>
-#include <atomic>
+#include <memory>
 #include <array>
 #include <utility>
 #include "mvrlu_api.hh"
 
 template <size_t L> class Node;
 
-constexpr const int MAX_LEVEL = 20;
+constexpr const int MAX_LEVEL = 17;
 using node_t = Node<MAX_LEVEL>;
 using node_ptr = node_t *;
 using deref_ptr = mvrlu_api::derefered_ptr<node_t>;
@@ -25,6 +25,8 @@ public:
 
   // Stores the reference of the next node until the top level for the node
   std::array<Node *, L + 1> next{nullptr};
+
+  std::unique_ptr<std::mutex> lock_ptr = std::make_unique<std::mutex>();
 
 private:
 

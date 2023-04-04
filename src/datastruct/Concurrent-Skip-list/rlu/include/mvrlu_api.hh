@@ -120,7 +120,7 @@ namespace mvrlu_api
       self_ = reinterpret_cast<T*>(get_handle().mvrlu_deref(master_node_ptr));
     }
 
-    derefered_ptr(derefered_ptr& ptr)
+    derefered_ptr(const derefered_ptr& ptr)
     {
       self_ = ptr.self_;
     }
