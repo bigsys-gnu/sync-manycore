@@ -62,6 +62,8 @@ bool lock_preds(std::vector<deref_ptr> &preds)
 
   for (auto iter = set.rbegin(); iter != set.rend(); iter++)
     {
+      // If we use MVRLU_TRY_LOCK, there might be a bug
+      // So, we have to use mutex try lock to not to allow other threads entering critical section.
       std::unique_lock<std::mutex> guard{*iter->second->lock_ptr, std::defer_lock};
       if (!guard.try_lock() || !iter->second.try_lock())
         {
