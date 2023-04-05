@@ -108,14 +108,8 @@ bool SkipList::add(int key)
 
   // Initialization of references of the predecessors and successors
   std::vector<deref_ptr> preds(MAX_LEVEL + 1);
-  int count = 0;
 
  restart:
-  if (count++ > 1000)
-    {
-      mvrlu_api::get_handle().mvrlu_flush_log();
-      count = 0;
-    }
   mvrlu_api::session session; // reader lock and unlock
 
   // Find the predecessors and successors of where the key must be inserted
@@ -182,14 +176,7 @@ bool SkipList::remove(int key)
   // Initialization of references of the predecessors and successors
   std::vector<deref_ptr> preds(MAX_LEVEL + 1);
 
-  int count = 0;
-
  restart:
-  if (count++ > 1000)
-    {
-      mvrlu_api::get_handle().mvrlu_flush_log();
-      count = 0;
-    }
   mvrlu_api::session session; // reader lock and unlock
   // Find the predecessors and successors of where the key to be deleted
   auto victim = find(key, preds);
