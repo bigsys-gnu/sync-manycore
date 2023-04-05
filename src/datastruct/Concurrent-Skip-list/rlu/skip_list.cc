@@ -202,8 +202,9 @@ bool SkipList::remove(int key)
   // If found, select the node to delete. else return
   int top_level = victim->get_level();
 
+  std::unique_lock<std::mutex> guard{*victim->lock_ptr, std::defer_lock};
   // create copy for every preds and victim
-  if (!victim.try_lock_const())
+  if (!guard.try_lock() || !victim.try_lock_const())
     {
       session.abort();
       goto restart;
@@ -223,6 +224,7 @@ bool SkipList::remove(int key)
     }
 
   victim.free();
+  guard.release();
 
   return true;
 }
