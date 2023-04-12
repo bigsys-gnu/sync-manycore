@@ -85,6 +85,9 @@ struct options
   TCLAP::ValueArg<std::string> workload_dist{"w", "workload_dist",
                                              "workload random distribution", false,
                                              "uniform", &workload_types};
+  TCLAP::ValueArg<float> zipf_s{"s", "zipf_s",
+                                "zipfian distribution exponent value", false,
+                                1.0, "float"};
 
   options(std::string_view welcome_msg, int argc, char *argv[]):
     cmd(welcome_msg.data())
@@ -94,6 +97,7 @@ struct options
     cmd.add(value_range);
     cmd.add(rw_ratio);
     cmd.add(workload_dist);
+    cmd.add(zipf_s);
     cmd.parse(argc, argv);
   }
 

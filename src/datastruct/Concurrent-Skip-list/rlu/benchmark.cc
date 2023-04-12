@@ -61,14 +61,16 @@ int main(int argc, char *argv[])
 
   for (size_t i = 0; i < gd.thread_num; i++)
     {
-      workers.emplace_back(mvrlu_api::create_thread([&gd]()
+      workers.emplace_back(mvrlu_api::create_thread([&gd, &ops]()
       {
         switch (gd.dist_type) {
         case workload_dist::UNIFORM:
           worker(gd, std::uniform_int_distribution<int>(1, gd.key_max));
           break;
         case workload_dist::ZIPF:
-          worker(gd, custom_random::zipf_distribution<int, double>(gd.key_max));
+          worker(gd, custom_random::
+                 zipf_distribution<int, double>(gd.key_max,
+                                                ops.zipf_s.getValue()));
           break;
         case workload_dist::NORMAL:
           break;
