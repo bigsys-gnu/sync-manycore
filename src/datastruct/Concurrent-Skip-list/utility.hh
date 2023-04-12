@@ -130,6 +130,10 @@ struct options
               << "Key Range:\t 1 ~ " << value_range.getValue() << '\n'
               << "Read Ratio:\t" << rw_ratio.getValue() << '\n'
               << "Random Distribution:\t" << workload_dist.getValue() << '\n';
+    if (workload_dist.getValue() == "zipf")
+      {
+        std::cout << "Zipf Exponent:\t" << zipf_s.getValue() << '\n';
+      }
   }
 };
 
