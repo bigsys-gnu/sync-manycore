@@ -61,9 +61,9 @@ struct global_data
   {
     assert(read_ratio < 1);
     float write_ratio = 1 - read_ratio;
-    operation_dist = std::discrete_distribution<unsigned int>{write_ratio / 2,
-                                                              write_ratio / 2,
-                                                              read_ratio};
+    operation_dist = std::discrete_distribution<unsigned int>{ {write_ratio / 2,
+                                                                  write_ratio / 2,
+                                                                  read_ratio} };
   }
 
 };
