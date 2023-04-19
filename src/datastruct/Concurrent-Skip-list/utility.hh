@@ -55,7 +55,7 @@ struct global_data
   workload_dist dist_type = workload_dist::UNIFORM;
 
   // default is add : remove : read = 1 : 1 : 1
-  std::discrete_distribution<unsigned int> operation_dist{1, 1, 1};
+  std::discrete_distribution<unsigned int> operation_dist{{1, 1, 1}};
 
   void set_operation_ratio(float read_ratio)
   {
